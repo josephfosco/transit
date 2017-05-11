@@ -1,0 +1,52 @@
+CONCEPTS
+--------
+
+Key
+    inharmonic
+    harmonic
+Pitch
+    high
+    low
+    ascending
+    descending
+    stable
+    repeating  - single note
+Rhythm
+    tempo - mm
+    fast
+    slow
+    dense
+    sparse
+    accellerating
+    decellerating
+Loop
+Harmony
+    consonant
+    dissonant
+    resolves
+Melody
+    step
+    skip
+    phrase
+        start
+        end
+    legato
+    staccato
+    articulated
+Instrument
+
+
+Things to do when you
+have to make a choice
+and are out of time
+------------
+Be silent (rest)
+Pick a random note
+Make a quick choice
+
+
+Store pitch as a index to a scale and an octave
+
+melody? -> workspace
+concepts -> slipnet
+player/ensemble? -> coderack
