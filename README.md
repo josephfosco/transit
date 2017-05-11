@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # transit
 
 FIXME: description
@@ -34,3 +35,6 @@ Copyright © 2017 FIXME
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
+=======
+# transit
+>>>>>>> a1be0f5e3d93bcd1700894f1efc4f5063fc6cfd9
