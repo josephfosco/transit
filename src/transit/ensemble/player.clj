@@ -13,12 +13,28 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.player)
+(ns transit.ensemble.player
+  (:require
+   [transit.ensemble.player-methods :refer [listen monitor-silence
+                                            play-random-note select-instrument]]
+   )
+  )
 
-(defrecord Player [id])
+(defrecord Player [id methods])
 
 (defn create-player
   [& {:keys [:id]}]
   (Player. id
+           [[play-random-note 1] [select-instrument 1] [monitor-silence 1]
+             [listen 1]
+             ]
            )
   )
+
+(defn is-playing?
+ "Returns:
+   true - if player is playing now
+   false - if player is not laying now
+ "
+ [player]
+ )

@@ -16,6 +16,7 @@
 (ns transit.control
   (:require
    [transit.config.config :refer [get-setting set-setting]]
+   [transit.ensemble.ensemble :refer [init-ensemble]]
    [transit.util.print :refer [print-banner]]
    )
   )
@@ -26,11 +27,14 @@
    keyword args -
    :num-players - optional, the number of players playing.
                   default value is set in config file"
- [& {:keys [num-players]}]
+  [num-players]
+  (init-ensemble num-players)
   )
 
 (defn start-transit
-  []
+  [& {:keys [num-players]}]
+  (when num-players (set-setting :num-players num-players))
+  (init-transit (get-setting :num-players))
   )
 
 (defn clear-transit

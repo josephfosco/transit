@@ -1,4 +1,4 @@
 {:log-level nil
 
- :num-players 64
+ :num-players 10
  }

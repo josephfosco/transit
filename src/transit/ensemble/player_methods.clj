@@ -13,7 +13,7 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.player-methods)
+(ns transit.ensemble.player-methods)
 
 (defn set-behavior
   [player]
@@ -23,12 +23,21 @@
   [player]
   )
 
+(defn play-next-note
+  "Use available information to select and play the next
+   relevent note for this player"
+  [player]
+  (println "******  play-next-note  ******")
+  )
+
 (defn play-rest
   [player]
+  (println "******  play-rest  ******")
   )
 
 (defn select-instrument
   [player]
+  (println "******  select-instrument  ******")
   )
 
 (defn monitor-silence
@@ -37,10 +46,12 @@
    Tell player how long you will watch for
   "
   [player]
+  (println "******  monitor-silence  ******")
   )
 
 (defn monitor-soft
   [player]
+  (println "******  monitor-soft  ******")
   )
 
 (defn listen
@@ -60,5 +71,6 @@
       volume trend
   "
   [player]
+  (println "******  listen  ******")
 
   )

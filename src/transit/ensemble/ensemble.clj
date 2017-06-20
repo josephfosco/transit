@@ -13,9 +13,10 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.ensemble
-  :require
-  [transmit.player :refer [create-player]]
+(ns transit.ensemble.ensemble
+  (:require
+   [transit.ensemble.player :refer [create-player]]
+   )
   )
 
 (defn new-player
@@ -24,5 +25,13 @@
   )
 
 (defn init-ensemble
-  []
+  [num-players]
+  {:players (zipmap (range num-players)
+                    (for [id (range num-players)] (create-player :id id)))
+   }
+  )
+
+(defn print-ensemble
+  [ensemble]
+
   )

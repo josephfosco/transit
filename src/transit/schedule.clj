@@ -13,13 +13,13 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transmit.schedule
+(ns transit.schedule
   (:require
-   [transmit.util.debug.debug :refer [debug-run1]]
-   [transmit.util.count-vector :refer [count-vector]]
-   [transmit.util.log :as log]
-   [transmit.util.print :refer print-msg]
-   [transmit.util.utils :refer :all]
+   [transit.util.debug.debug :refer [debug-run1]]
+   [transit.util.count-vector :refer [count-vector]]
+   [transit.util.log :as log]
+   [transit.util.print :refer print-msg]
+   [transit.util.utils :refer :all]
    )
   (import [java.util Date TimerTask Timer])
   )
