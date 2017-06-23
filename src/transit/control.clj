@@ -16,7 +16,7 @@
 (ns transit.control
   (:require
    [transit.config.config :refer [get-setting set-setting]]
-   [transit.ensemble.ensemble :refer [init-ensemble]]
+   [transit.ensemble.ensemble :refer [init-ensemble start-playing]]
    [transit.util.print :refer [print-banner]]
    )
   )
@@ -34,7 +34,9 @@
 (defn start-transit
   [& {:keys [num-players]}]
   (when num-players (set-setting :num-players num-players))
-  (init-transit (get-setting :num-players))
+  (-> (init-transit (get-setting :num-players))
+      (start-playing)
+      )
   )
 
 (defn clear-transit

@@ -16,10 +16,10 @@
 (ns transit.core
   (:gen-class)
   (:require
+   [overtone.live :as overtone]
    [transit.control :refer [clear-transit pause-transit quit-transit
                             start-transit ]]
    [transit.version :refer [TRANSIT-VERSION-STR]]
-   [overtone.live :as overtone]
    ))
 
  (defn -main
@@ -74,7 +74,9 @@
      (transit-help)         Print this message
 
 
-"))
+   ")
+  (println "")
+  )
 
 (defn start64
   []

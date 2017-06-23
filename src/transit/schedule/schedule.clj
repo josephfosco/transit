@@ -13,7 +13,7 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.schedule
+(ns transit.schedule.schedule
   (:require
    [transit.util.debug.debug :refer [debug-run1]]
    [transit.util.count-vector :refer [count-vector]]

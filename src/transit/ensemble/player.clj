@@ -38,3 +38,8 @@
  "
  [player]
  )
+
+(defn play-note
+  [ensemble player-id event-time]
+  (println player-id event-time)
+ )
