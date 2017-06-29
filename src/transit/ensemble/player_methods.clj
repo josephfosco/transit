@@ -21,6 +21,7 @@
 
 (defn play-random-note
   [player]
+  (println "******  play-random-note  ******")
   )
 
 (defn play-next-note

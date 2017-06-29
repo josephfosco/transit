@@ -15,15 +15,8 @@
 
 (ns transit.ensemble.ensemble
   (:require
-   [overtone.live :refer [now]]
    [transit.config.config :refer [get-setting]]
-   [transit.ensemble.player :refer [create-player play-note]]
    )
-  )
-
-(defn new-player
-  [player-id]
-  (create-player player-id)
   )
 
 (defn get-player
@@ -31,25 +24,12 @@
   (get (:players ensemble) player-id)
   )
 
-(defn play-first-note
-  [ensemble player-id]
-  (play-note ensemble player-id (now) )
-  )
-
-(defn start-playing
-  "calls play-note the first time for every player in ensemble"
-  [ensemble]
-  (println "********** start-playing ****************")
-  (dotimes [id (get-setting :num-players)] (play-first-note ensemble id))
-  )
-
 (defn init-ensemble
-  [num-players]
-  {:players (zipmap (range num-players)
-                    (for [id (range num-players)] (create-player :id id)))
-   :melodies (zipmap (range num-players)
-                     (repeat {})
-                     )
+  [new-players]
+  (println "************* init-ensemble *******************")
+  (println new-players)
+  {:players (into {} (for [player new-players] [(:id player) player]))
+   :melodies (zipmap (range (get-setting :num-players)) (repeat {}))
    }
   )
 

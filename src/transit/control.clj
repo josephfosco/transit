@@ -15,8 +15,10 @@
 
 (ns transit.control
   (:require
+   [overtone.live :refer [now]]
    [transit.config.config :refer [get-setting set-setting]]
-   [transit.ensemble.ensemble :refer [init-ensemble start-playing]]
+   [transit.ensemble.ensemble :refer [init-ensemble]]
+   [transit.ensemble.player :refer [create-player play-note]]
    [transit.util.print :refer [print-banner]]
    )
   )
@@ -24,19 +26,38 @@
 (defn init-transit
   "Initialize transit to play. Use only once (first time)
 
-   keyword args -
-   :num-players - optional, the number of players playing.
-                  default value is set in config file"
-  [num-players]
-  (init-ensemble num-players)
+   args -
+   players - map of all initial players"
+  [players]
+  (init-ensemble players)
+  )
+
+(defn new-player
+  [player-id]
+  (create-player :id player-id)
+  )
+
+(defn- play-first-note
+  [ensemble player-id]
+  (play-note ensemble player-id (now) )
+  )
+
+(defn- start-playing
+  "calls play-note the first time for every player in ensemble"
+  [ensemble]
+  (println "********** start-playing ****************")
+  (dotimes [id (get-setting :num-players)] (play-first-note ensemble id))
   )
 
 (defn start-transit
   [& {:keys [num-players]}]
   (when num-players (set-setting :num-players num-players))
-  (-> (init-transit (get-setting :num-players))
-      (start-playing)
-      )
+  (let [number-of-players (get-setting :num-players)]
+    (-> (map new-player (range number-of-players))
+        (init-transit)
+        (start-playing)
+        )
+    )
   )
 
 (defn clear-transit

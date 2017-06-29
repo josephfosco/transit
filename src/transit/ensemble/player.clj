@@ -15,6 +15,7 @@
 
 (ns transit.ensemble.player
   (:require
+   [transit.ensemble.ensemble :refer [get-player]]
    [transit.ensemble.player-methods :refer [listen monitor-silence
                                             play-random-note select-instrument]]
    )
@@ -39,7 +40,22 @@
  [player]
  )
 
+(defn select-method
+  [player]
+  (let [methods (:methods player)]
+    (first (get methods (rand-int (count methods))))
+    )
+  )
+
+(defn run-player-method
+  [ensemble player-id]
+  (let [player (get-player ensemble player-id)]
+    ((select-method player) player)
+    )
+  )
+
 (defn play-note
   [ensemble player-id event-time]
   (println player-id event-time)
+  (run-player-method ensemble player-id)
  )
