@@ -18,7 +18,7 @@
    [overtone.live :refer [now]]
    [transit.config.config :refer [get-setting set-setting]]
    [transit.ensemble.ensemble :refer [init-ensemble]]
-   [transit.ensemble.player :refer [create-player play-note]]
+   [transit.ensemble.player :refer [create-player play-next-note]]
    [transit.util.print :refer [print-banner]]
    )
   )
@@ -39,7 +39,7 @@
 
 (defn- play-first-note
   [ensemble player-id]
-  (play-note ensemble player-id (now) )
+  (play-next-note ensemble player-id (now) )
   )
 
 (defn- start-playing

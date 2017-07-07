@@ -15,9 +15,11 @@
 
 (ns transit.ensemble.player
   (:require
-   [transit.ensemble.ensemble :refer [get-player]]
+   [transit.ensemble.ensemble :refer [get-melody get-player
+                                      update-player-and-melody]]
    [transit.ensemble.player-methods :refer [listen monitor-silence
                                             play-random-note select-instrument]]
+   [transit.util.util :refer [remove-element-from-vector]]
    )
   )
 
@@ -32,30 +34,48 @@
            )
   )
 
+(defn get-player-method
+  [player ndx]
+  (first (get (:methods player) ndx))
+  )
+
 (defn is-playing?
  "Returns:
    true - if player is playing now
    false - if player is not laying now
  "
  [player]
- )
+  )
 
 (defn select-method
+  " Returns the ndx into player-methods of the method to run "
   [player]
-  (let [methods (:methods player)]
-    (first (get methods (rand-int (count methods))))
-    )
+  (rand-int (count (:methods player)))
   )
 
 (defn run-player-method
-  [ensemble player-id]
-  (let [player (get-player ensemble player-id)]
-    ((select-method player) player)
+  " Selects and executes one of the player :methods
+    Returns player after executing method with the selected
+      method removed from :methods
+  "
+  [player]
+  (let [method-ndx (select-method player)]
+    ((get-player-method player method-ndx) player)
+    (assoc player
+           :methods
+           (remove-element-from-vector (:methods player) method-ndx))
     )
   )
 
-(defn play-note
+(defn play-next-note
   [ensemble player-id event-time]
-  (println player-id event-time)
-  (run-player-method ensemble player-id)
+  (let [player (get-player ensemble player-id)
+        melody (get-melody ensemble player-id)
+        ]
+    (->
+     (run-player-method player)
+     (update-player-and-melody {} player-id)
+     )
+    )
+  (println (- (System/currentTimeMillis) event-time))
  )

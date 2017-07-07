@@ -19,18 +19,42 @@
    )
   )
 
+(def ensemble (atom nil))
+
+(defn get-melody
+  [ensemble player-id]
+  (get (:melodies ensemble) player-id)
+  )
+
 (defn get-player
   [ensemble player-id]
   (get (:players ensemble) player-id)
   )
 
+(defn player-and-melody-update
+  [ens player melody player-id]
+  (assoc ens
+         :players (assoc (:players ens) player-id player)
+         :melodies (assoc (:melodies ens) player-id melody)
+         )
+  )
+
+(defn update-player-and-melody
+  [player melody player-id]
+  (swap! ensemble player-and-melody-update player melody player-id)
+ )
+
 (defn init-ensemble
   [new-players]
-  (println "************* init-ensemble *******************")
-  (println new-players)
-  {:players (into {} (for [player new-players] [(:id player) player]))
-   :melodies (zipmap (range (get-setting :num-players)) (repeat {}))
-   }
+  (reset!
+   ensemble
+   {:players
+    (into {} (for [player new-players] [(:id player) player]))
+    :melodies
+    (zipmap (range (get-setting :num-players)) (repeat {}))
+    }
+   )
+  @ensemble
   )
 
 (defn print-ensemble
