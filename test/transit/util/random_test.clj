@@ -13,34 +13,30 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.util.util-test
+(ns transit.util.random-test
   (:use clojure.test
-        transit.util.util
+        transit.util.random
         )
   )
 
-(deftest test-remove-element-from-vector
-  (testing "removes inner element from vector"
-    (is (=
-         (remove-element-from-vector [["a" 0] ["b" 1] ["c" 2] ["d" 3] ["e" 4]] 2)
-         [["a" 0] ["b" 1] ["d" 3] ["e" 4]]
+(deftest test-weighted-choice
+  (testing "returns index into array"
+    (is (<=
+         0
+         (weighted-choice [10 10 10 10])
+         3
          )
         )
     )
 
-  (testing "removes first element from vector"
-    (is (=
-         (remove-element-from-vector [["a" 0] ["b" 1] ["c" 2] ["d" 3] ["e" 4]] 0)
-         [["b" 1] ["c" 2] ["d" 3] ["e" 4]]
-         )
-        )
-    )
-
-    (testing "removes last element from vector"
-    (is (=
-         (remove-element-from-vector [["a" 0] ["b" 1] ["c" 2] ["d" 3] ["e" 4]] 4)
-         [["a" 0] ["b" 1] ["c" 2] ["d" 3]]
-         )
-        )
-    )
-)
+  (testing "returns different indexes"
+    (let [result-1 (weighted-choice [10 10])
+          result-2 (weighted-choice [10 10])
+          result-3 (weighted-choice [10 10])
+          ]
+      (is (<= 0 result-1 1))
+      (is (<= 0 result-2 1))
+      (is (<= 0 result-2 1))
+      (is (not (= result-1 result-2 result-3)))
+      ))
+  )

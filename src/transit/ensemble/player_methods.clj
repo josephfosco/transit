@@ -22,6 +22,7 @@
 (defn play-random-note
   [player]
   (println "******  play-random-note  ******")
+  player
   )
 
 (defn play-next-note
@@ -29,16 +30,19 @@
    relevent note for this player"
   [player]
   (println "******  play-next-note  ******")
+  player
   )
 
 (defn play-rest
   [player]
   (println "******  play-rest  ******")
+  player
   )
 
 (defn select-instrument
   [player]
   (println "******  select-instrument  ******")
+  (assoc player :instrument nil)
   )
 
 (defn monitor-silence
@@ -48,11 +52,19 @@
   "
   [player]
   (println "******  monitor-silence  ******")
+  player
   )
 
 (defn monitor-soft
   [player]
   (println "******  monitor-soft  ******")
+  player
+  )
+
+(defn sync-with-another-player
+  [player]
+  (println "******  sync-with-another-player  ******")
+  player
   )
 
 (defn listen
@@ -73,5 +85,38 @@
   "
   [player]
   (println "******  listen  ******")
+  player
+  )
 
+
+;; TOP DOWN METHODS
+
+(defn build-melody
+  [player]
+  (println "******  build-melody  ******")
+  player
+  )
+
+(defn build-countermelody
+  [player]
+  (println "******  build-countermelody  ******")
+  player
+  )
+
+(defn sustained-accompaniment
+  [player]
+  (println "******  sustained-accompaniment  ******")
+  player
+  )
+
+(defn arpegiation
+  [player]
+  (println "******  arpegiation  ******")
+  player
+  )
+
+(defn loop
+  [player]
+  (println "******  loop  ******")
+  player
   )

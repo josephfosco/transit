@@ -13,7 +13,7 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.random)
+(ns transit.util.random)
 
 (defn random-int
   "Returns a random integer between lo (inclusive) and hi (inclusive).
@@ -31,22 +31,18 @@
 
 (defn weighted-choice
   "Makes a random selection based on a vector of weights.
-   Returns the index into the vector of the selection (0 - (length of vector - 1)
+   Returns the index into the vector of the selection
+   Will throw an IndexOutOfBounds exception if the vector is empty
 
    weight-vector - vector of the form [x1 x2 x3 x4 ....]
                    where each entry is the relative weight of that entry"
   [weight-vector]
-  (try
-    (loop [i 0 rnd-num (inc (rand-int (reduce + weight-vector))) w-vec weight-vector]
-      (let [rnd-total (- rnd-num (first w-vec))]
-        (if (< rnd-total 1)
-          i
-          (recur (inc i) rnd-total (rest w-vec)))))
-    (catch NullPointerException e
-      (println "weighted-choice" "weight-vector: " weight-vector)
-      (throw (Throwable. "Invalid weight-vector"))
-        )
-    ))
+  (let [rand-num (rand (reduce + weight-vector))]
+    (loop [i 0 sum 0]
+      (if (< rand-num (+ (weight-vector i) sum))
+        i
+        (recur (inc i) (+ (weight-vector i) sum)))))
+  )
 
 (defn add-probabilities
   "Adds to probabilities in prob-vector. This function does not

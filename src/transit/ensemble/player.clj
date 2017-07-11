@@ -19,6 +19,7 @@
                                       update-player-and-melody]]
    [transit.ensemble.player-methods :refer [listen monitor-silence
                                             play-random-note select-instrument]]
+   [transit.util.random :refer [weighted-choice]]
    [transit.util.util :refer [remove-element-from-vector]]
    )
   )
@@ -34,9 +35,13 @@
            )
   )
 
+(defn get-player-instrument
+  [player]
+  (:instrument player))
+
 (defn get-player-method
   [player ndx]
-  (first (get (:methods player) ndx))
+  (first ((:methods player) ndx))
   )
 
 (defn is-playing?
@@ -50,7 +55,7 @@
 (defn select-method
   " Returns the ndx into player-methods of the method to run "
   [player]
-  (rand-int (count (:methods player)))
+  (weighted-choice (mapv second (:methods player)))
   )
 
 (defn run-player-method
@@ -60,10 +65,11 @@
   "
   [player]
   (let [method-ndx (select-method player)]
-    ((get-player-method player method-ndx) player)
-    (assoc player
-           :methods
-           (remove-element-from-vector (:methods player) method-ndx))
+    (->
+     ((get-player-method player method-ndx) player)
+     (assoc :methods
+            (remove-element-from-vector (:methods player) method-ndx))
+     )
     )
   )
 
