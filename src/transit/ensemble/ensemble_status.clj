@@ -13,37 +13,25 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.ensemble.player
-  (:require
-   [transit.ensemble.player-methods :refer [listen monitor-silence
-                                            play-random-note select-instrument]]
-   )
+(ns transit.ensemble.ensemble-status
   )
 
-(defrecord Player [id key mm instrument methods sampled-melodies])
+(defrecord EnsembleStatus [])
 
-(defn get-initial-player-methods
-  []
-  [
-   [select-instrument 1] [monitor-silence 1] [listen 1]
-   ]
-  )
-
-(defn create-player
-  [& {:keys [:id]}]
-  (Player. id
-           nil  ;; key
-           nil  ;; mm
-           nil  ;; instrument
+(defn create-ensemble-status
+  [& {:keys [num-players-counted
+             keys
+             scales
+             num-loud
+             num-soft
+             num-fast
+             num-slow
+             num-melody
+             num-sustained
+             num-rhythmic
+             ]
+      }]
+  (EnsembleStatus. id
            (get-initial-player-methods)
-           nil  ;; sampled-melodies
            )
   )
-
-(defn get-player-id
-  [player]
-  (:id player))
-
-(defn get-player-instrument
-  [player]
-  (:instrument player))

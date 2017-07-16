@@ -16,7 +16,7 @@
 (ns transit.util.log
   (:import [java.util.logging Logger Level ConsoleHandler FileHandler
             StreamHandler Formatter LogRecord])
-  (:require [transit.settings :refer [get-setting]]
+  (:require [transit.config.config :refer [get-setting]]
             ))
 
 (def ^:private LOG-LEVELS {:data2 Level/FINEST

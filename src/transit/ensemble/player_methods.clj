@@ -42,7 +42,19 @@
 (defn select-instrument
   [player]
   (println "******  select-instrument  ******")
-  (assoc player :instrument nil)
+  (let [cur-methods (:methods player)
+        add-play-random-note-method (nil? (:instrument player))
+        new-instrument nil
+        ]
+    (if add-play-random-note-method
+      (assoc player
+             :instrument new-instrument
+             :methods (conj cur-methods [play-random-note 10])
+             )
+      (assoc player
+             :instrument new-instrument
+             )
+      ))
   )
 
 (defn monitor-silence
@@ -115,7 +127,7 @@
   player
   )
 
-(defn loop
+(defn loop-notes
   [player]
   (println "******  loop  ******")
   player

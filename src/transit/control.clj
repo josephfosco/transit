@@ -18,7 +18,8 @@
    [overtone.live :refer [now]]
    [transit.config.config :refer [get-setting set-setting]]
    [transit.ensemble.ensemble :refer [init-ensemble]]
-   [transit.ensemble.player :refer [create-player play-next-note]]
+   [transit.ensemble.player :refer [create-player]]
+   [transit.ensemble.player-play-note :refer [play-next-note]]
    [transit.util.print :refer [print-banner]]
    )
   )

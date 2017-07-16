@@ -50,3 +50,55 @@ Store pitch as a index to a scale and an octave
 melody? -> workspace
 concepts -> slipnet
 player/ensemble? -> coderack
+
+
+-------------------
+
+Things a player can be doing
+- Playong a melody
+  - notes generally of relatively same length
+  - long notes at ends of phrases
+  - quickest notes in flourishes (generally either up or down)
+  - generally somewhat restricted range
+- Playing primarily rhythmic material
+  - maybe 1 or a few notes
+- Playing random notes
+- Playing accents
+- Playing sustained notes
+- Playing a counter melody
+- Playing harmony (esp with long notes)
+- Playing an ostinato (melody and/or rhythm)
+- Listening - building up what it will do
+- Accellerating
+- Decellerating
+- Getting Louder
+- Getting Softer
+- Playing Loud
+- Playing soft
+
+< ~ = Perhaps/Maybe>
+- Look For local structures in other melodies
+- ~ store the player id of the melody you are looking at
+- ~ store the melody segment you are working with and
+update it periodically
+- ~ story melodies as pitch and rhythm/length (Rhythm would
+require storing mm for each note)
+- ~ store volume
+
+Types of Local Structures
+-------------------------
+
+- arpeggio (nymber of notes)
+- stepwise motion up/down
+- repeated note
+- step then leap
+- leap (~ include scale degrees)
+- non-harmonic/diatonic pitch(es)
+- note then rest - or mostly rest
+- sustained tones (predominately)
+- rapid run up/down
+- retrograde
+- inverse
+- augmentation (slowing down - if rhythm)
+- diminution (speeding up - if rhythm)
+- root

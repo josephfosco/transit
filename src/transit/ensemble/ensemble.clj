@@ -19,7 +19,7 @@
    )
   )
 
-(def ensemble (atom nil))
+(def ^:private ensemble (atom nil))
 
 (defn get-melody
   [ensemble player-id]
