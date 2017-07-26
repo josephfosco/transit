@@ -28,10 +28,6 @@
    [transit.util.print :refer [print-msg]]
    ))
 
-(def LO-RANGE 47)
-(def MID-RANGE 79)
-(def HI-RANGE (last MIDI-RANGE))
-
 (def perc-env (sorted-set "AD" "NE"))
 (def non-perc-env (sorted-set "ADSR" "ASR"))
 

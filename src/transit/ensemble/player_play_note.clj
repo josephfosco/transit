@@ -17,6 +17,7 @@
   (:require
    [transit.ensemble.ensemble :refer [get-melody get-player
                                       update-player-and-melody]]
+   [transit.ensemble.player-methods :refer [NEXT-METHOD]]
    [transit.util.random :refer [weighted-choice]]
    [transit.util.util :refer [remove-element-from-vector]]
    )
@@ -30,7 +31,7 @@
 (defn is-playing?
  "Returns:
    true - if player is playing now
-   false - if player is not laying now
+   false - if player is not playing now
  "
  [player]
   )
@@ -46,25 +47,36 @@
     Returns player after executing method with the selected
       method removed from :methods
   "
-  [player]
+  [[ensemble player melody player-id :as method_context]]
   (let [method-ndx (select-method player)]
-    (->
-     ((get-player-method player method-ndx) player)
-     (assoc :methods
-            (remove-element-from-vector (:methods player) method-ndx))
+    ;; remove the method that will be run from player :methods
+    ((get-player-method player method-ndx)
+     [ensemble
+      (assoc player
+             :methods (remove-element-from-vector (:methods player)  method-ndx))
+      melody
+      player-id
+      ])
      )
-    )
+  )
+
+(defn stop-running-methods?
+  [[_ player melody player-id rtn-map]]
+  (or (= 0 (count (:methods player )))
+      (not= (:status rtn-map) NEXT-METHOD)
+      )
   )
 
 (defn play-next-note
   [ensemble player-id event-time]
   (let [player (get-player ensemble player-id)
         melody (get-melody ensemble player-id)
+        method-context [ensemble player melody player-id {:status NEXT-METHOD}]
+        [_ new-player new-melody player-id rtn]
+        (first (filter stop-running-methods?
+                       (iterate run-player-method method-context)))
         ]
-    (->
-     (run-player-method player)
-     (update-player-and-melody {} player-id)
-     )
+    (update-player-and-melody new-player new-melody player-id)
     )
   (println (- (System/currentTimeMillis) event-time))
  )
