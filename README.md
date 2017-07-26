@@ -16,6 +16,9 @@ To run tests
   Start a REPL
   Load all tests from the test directory
   (clojure.test/run-all-tests #"transit.*")
+  
+To run tests in one namespace
+  (clojure.test/run-tests '<namespace>)
 
 ...
 

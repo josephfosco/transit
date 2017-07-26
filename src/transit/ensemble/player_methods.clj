@@ -21,7 +21,7 @@
 (def NEXT-METHOD 3)  ;; Select and call another method
 
 (defn choose-instrument
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id]]
 
   )
 
