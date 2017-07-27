@@ -61,7 +61,7 @@
   )
 
 (defn stop-running-methods?
-  [[_ player melody player-id rtn-map]]
+  [event_time [_ player melody player-id rtn-map]]
   (or (= 0 (count (:methods player )))
       (not= (:status rtn-map) NEXT-METHOD)
       )
@@ -73,7 +73,7 @@
         melody (get-melody ensemble player-id)
         method-context [ensemble player melody player-id {:status NEXT-METHOD}]
         [_ new-player new-melody player-id rtn]
-        (first (filter stop-running-methods?
+        (first (filter (partial stop-running-methods? event-time)
                        (iterate run-player-method method-context)))
         ]
     (update-player-and-melody new-player new-melody player-id)

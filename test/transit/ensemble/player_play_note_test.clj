@@ -26,21 +26,36 @@
   (testing "returns false if there are mathods and status no NEXT-METHOD"
     (is (=
          true
-         (stop-running-methods? [{} {:methods [1 1]} 0 {:status CONTINUE}])
+         (stop-running-methods? (+ (System/currentTimeMillis) 1000)
+                                [{}
+                                 {:methods [1 1]}
+                                 0
+                                 {:status CONTINUE}
+                                 ])
          )
         )
     )
   (testing "returns true if there are no methods in the player"
     (is (=
          true
-         (stop-running-methods? [{} {:methods {}} 0 {:status CONTINUE}])
+         (stop-running-methods? (+ (System/currentTimeMillis) 1000)
+                                [{}
+                                 {:methods {}}
+                                 0
+                                 {:status CONTINUE}
+                                 ])
          )
         )
     )
   (testing "returns true if status is NEXT-METHOD"
     (is (=
          true
-         (stop-running-methods? [{} {:methods [1 1]} 0 {:status NEXT-METHOD}])
+         (stop-running-methods? (+ (System/currentTimeMillis) 1000)
+                                [{}
+                                 {:methods [1 1]}
+                                 0
+                                 {:status NEXT-METHOD}
+                                 ])
          )
         )
     )
