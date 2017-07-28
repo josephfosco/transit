@@ -13,18 +13,36 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.instruments.elec-instruments
+(ns transit.instr.instruments.trad-instruments
   ^{:author "Joseph Fosco"
-    :doc "Electronic instruments"}
+    :doc "Electronic imitations of traditional instruments"}
   (:require
    [overtone.live :refer :all]
    ))
 
-(definst reedy-organ
-  [freq 440 vol 0.3 release 0.1 attack 0.01 sustain 0.3 gate 1.0 action FREE]
-  (-> (sin-osc freq)
-      (+ (saw freq) (saw (+ freq 3)) (sin-osc (* 2 freq)))
+(definst bassoon
+  [freq 110 vol 1.0 release 0.1 attack 0.01 sustain 0.3 gate 1.0 action FREE]
+  (-> (saw freq)
+      (bpf (* 2 freq) 2.0)
       (* (env-gen (asr attack sustain release) gate vol 0 1 action))
-      (* vol)
+      (* vol 4)
       )
   )
+
+(definst clarinet
+  [freq 440 vol 1.0 release 0.1 attack 0.01 sustain 0.3 gate 1.0 action FREE]
+  (-> (square [freq (* freq 1.01) (* freq 0.99)])
+      (lpf (line:kr (* freq 8) (* freq 2) 0.5))
+      (* (env-gen (asr attack sustain release) gate vol 0 1 action))
+      (* vol 1.2)
+      )
+  )
+
+(definst pluck-string
+  [freq 440 vol 1.0 gate 1.0 action FREE]
+  (let [dur (/ 440 freq)]
+    (-> (pluck (white-noise) 1 1 (/ 1 freq) dur)
+        (* (env-gen (perc 0.0 dur) :action action))
+        (* vol)
+        ))
+)

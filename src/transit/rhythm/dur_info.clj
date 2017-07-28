@@ -13,16 +13,6 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.melody.melody-event
-  (:require
-   [transit.ensemble.ensemble :refer [get-player]]
-   )
-  )
+(ns transit.rhythm.dur-info)
 
-(defrecord MelodyEvent [id note dur-info instrument-info note-event-time note-play-time player-id sc-instrument-id volume])
-
-(defn create-melody-event
-  [& {:keys [:id note ]}]
-  (MelodyEvent. id
-                )
-  )
+(defrecord DurInfo [dur-millis dur-beats])

@@ -13,7 +13,11 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.ensemble.player-methods)
+(ns transit.ensemble.player-methods
+  (:require
+   [transit.instr.instrument :refer [select-random-instrument]]
+   )
+  )
 
 ;; method return values
 (def CONTINUE 1)  ;; Processing complete - do not call additional methods
@@ -22,7 +26,7 @@
 
 (defn choose-instrument
   [[ensemble player melody player-id]]
-
+  (select-random-instrument)
   )
 
 
@@ -37,7 +41,10 @@
 (defn play-random-note
   [[ensemble player melody player-id rtn-map]]
   (println "******  play-random-note  ******")
-  [ensemble player melody player-id {:status CONTINUE}]
+  ;; (select-random-note)
+  ;; (select-random-volume
+  ;; (select-random-rhythm)
+  [ensemble player melody player-id {:status NEW-MELODY}]
   )
 
 (defn play-next-note
@@ -55,11 +62,11 @@
   )
 
 (defn select-instrument
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id rtn-map :as args]]
   (println "******  select-instrument  ******")
   (let [cur-methods (:methods player)
         add-play-random-note-method? (nil? (:instrument player))
-        new-instrument nil
+        new-instrument (choose-instrument args)
         new-player (if add-play-random-note-method?
                      (assoc player
                             :instrument new-instrument

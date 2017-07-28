@@ -13,28 +13,18 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.instruments.pitched-perc-instruments
+(ns transit.instr.instruments.elec-instruments
   ^{:author "Joseph Fosco"
-    :doc "Pitched Percussion Instruments"}
+    :doc "Electronic instruments"}
   (:require
    [overtone.live :refer :all]
    ))
 
-(definst steel-drum
-  [freq 440 amp 0.8 gate 1.0 action FREE]
-  (-> (sin-osc (/ freq 2))
-      (+ (rlpf (saw freq) (* 1.1 freq) 0.4))
-      (* (env-gen (perc 0.01 0.5) gate (* amp 0.666) 0 1 action))
-   )
+(definst reedy-organ
+  [freq 440 vol 0.3 release 0.1 attack 0.01 sustain 0.3 gate 1.0 action FREE]
+  (-> (sin-osc freq)
+      (+ (saw freq) (saw (+ freq 3)) (sin-osc (* 2 freq)))
+      (* (env-gen (asr attack sustain release) gate vol 0 1 action))
+      (* vol)
+      )
   )
-
-(definst steel-drum-sus
-  [freq 440 amp 0.8]
-  (-> (sin-osc (/ freq 2))
-      (+ (rlpf (saw freq) (* 1.1 freq) 0.4))
-      (* (env-gen (perc 0.01 0.5) 1 1 0 1 :action FREE))
-      (* (/ amp 1.5))
-   )
-  )
-(def steel-drum-sus-delay (inst-fx! steel-drum-sus fx-echo))
-(ctl steel-drum-sus-delay :delay-time 0.1)

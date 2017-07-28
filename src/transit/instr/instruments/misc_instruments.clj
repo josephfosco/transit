@@ -13,7 +13,7 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.instruments.misc-instruments
+(ns transit.instr.instruments.misc-instruments
   ^{:doc "Miscellaneous Instruments collected from various sources"}
   (:require
    [overtone.live :refer :all]
