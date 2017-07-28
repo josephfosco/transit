@@ -18,7 +18,7 @@ To run tests
   (clojure.test/run-all-tests #"transit.*")
   
 To run tests in one namespace
-  (clojure.test/run-tests '<namespace>)
+  (clojure.test/run-tests '<namespace-test>)
 
 ...
 

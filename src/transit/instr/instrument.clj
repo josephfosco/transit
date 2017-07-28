@@ -13,20 +13,21 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.instrument
+(ns transit.instr.instrument
   (:require
    [overtone.live :refer :all]
    ;; [transit.constants :refer :all]
-   [transit.ensemble.player :refer [get-player-id]]
-   [transit.instrumentinfo :refer :all]
-   [transit.instruments.elec-instruments :refer :all]
-   [transit.instruments.misc-instruments :refer :all]
-   [transit.instruments.osc-instruments :refer :all]
-   [transit.instruments.pitched-perc-instruments :refer :all]
-   [transit.instruments.trad-instruments :refer :all]
+;;   [transit.ensemble.player :refer [get-player-id]]
+   [transit.instr.instrumentinfo :refer :all]
+   [transit.instr.instruments.elec-instruments :refer :all]
+   [transit.instr.instruments.misc-instruments :refer :all]
+   [transit.instr.instruments.osc-instruments :refer :all]
+   [transit.instr.instruments.pitched-perc-instruments :refer :all]
+   [transit.instr.instruments.trad-instruments :refer :all]
    [transit.util.log :as log]
    [transit.util.print :refer [print-msg]]
-   ))
+   )
+  )
 
 (def perc-env (sorted-set "AD" "NE"))
 (def non-perc-env (sorted-set "ADSR" "ASR"))
@@ -128,34 +129,34 @@
      :range-lo (get-range-lo-for-inst-info inst-info))
     ))
 
-(defn select-instrument
-  "Selects instrument-info for player.
+;; (defn select-instrument
+;;   "Selects instrument-info for player.
 
-   player - the player to get instrument for"
-  [player]
-  (let [instrument-list all-instruments
-        inst-info (if (empty? instrument-list)
-                    (do
-                      (log/warn (log/format-msg "select-instrument" "*** INSTRUMENT LIST EMPTY *************************"))
-                      (log/warn (log/format-msg "select-instrument"
-                                                "player-id: "
-                                                (get-player-id player)
-                                                ))
-                      (rand-nth all-instruments)
-                      )
-                    (rand-nth instrument-list)
-                    )
-        ]
+;;    player - the player to get instrument for"
+;;   [player]
+;;   (let [instrument-list all-instruments
+;;         inst-info (if (empty? instrument-list)
+;;                     (do
+;;                       (log/warn (log/format-msg "select-instrument" "*** INSTRUMENT LIST EMPTY *************************"))
+;;                       (log/warn (log/format-msg "select-instrument"
+;;                                                 "player-id: "
+;;                                                 (get-player-id player)
+;;                                                 ))
+;;                       (rand-nth all-instruments)
+;;                       )
+;;                     (rand-nth instrument-list)
+;;                     )
+;;         ]
 
-    (create-instrument-info
-     :instrument (get-instrument-for-inst-info inst-info)
-     :envelope-type (get-envelope-type-for-inst-info inst-info)
-     :release-dur (get-release-dur-for-inst-info inst-info)
-     :range-hi (get-range-hi-for-inst-info inst-info)
-     :range-lo (get-range-lo-for-inst-info inst-info)
-     )
-    )
-  )
+;;     (create-instrument-info
+;;      :instrument (get-instrument-for-inst-info inst-info)
+;;      :envelope-type (get-envelope-type-for-inst-info inst-info)
+;;      :release-dur (get-release-dur-for-inst-info inst-info)
+;;      :range-hi (get-range-hi-for-inst-info inst-info)
+;;      :range-lo (get-range-lo-for-inst-info inst-info)
+;;      )
+;;     )
+;;   )
 
 (defn has-release?
   [inst-info]

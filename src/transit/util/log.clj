@@ -86,7 +86,7 @@
 
 (defn- initial-log-level
   []
-  (or (get-setting "log-level")
+  (or (get-setting :log-level)
       DEFAULT-LOG-LEVEL))
 
 (defn- log-formatter
