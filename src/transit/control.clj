@@ -20,6 +20,7 @@
    [transit.ensemble.ensemble :refer [init-ensemble]]
    [transit.ensemble.player :refer [create-player]]
    [transit.ensemble.player-play-note :refer [play-next-note]]
+   [transit.melody.melody-event :refer [create-melody-event]]
    [transit.util.print :refer [print-banner]]
    )
   )
@@ -29,13 +30,26 @@
 
    args -
    players - map of all initial players"
-  [players]
-  (init-ensemble players)
+  [players melodies]
+  (init-ensemble players melodies)
   )
 
 (defn new-player
   [player-id]
   (create-player :id player-id)
+  )
+
+(defn init-melody
+  [player-id]
+
+  (vector (create-melody-event :id 0
+                               :note nil
+                               :dur-info nil
+                               :volume nil
+                               :instrument-info nil
+                               :player-id player-id
+                               :event-time 0
+                               ))
   )
 
 (defn- play-first-note
@@ -53,9 +67,11 @@
 (defn start-transit
   [& {:keys [num-players]}]
   (when num-players (set-setting :num-players num-players))
-  (let [number-of-players (get-setting :num-players)]
-    (-> (map new-player (range number-of-players))
-        (init-transit)
+  (let [number-of-players (get-setting :num-players)
+        init-players (map new-player (range number-of-players))
+        init-melodies (map init-melody (range number-of-players))
+        ]
+    (-> (init-transit init-players init-melodies)
         (start-playing)
         )
     )

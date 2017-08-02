@@ -17,7 +17,7 @@
   (:require
    [transit.ensemble.ensemble :refer [get-melody get-player
                                       update-player-and-melody]]
-   [transit.ensemble.player-methods :refer [NEXT-METHOD]]
+   [transit.ensemble.player-methods :refer [NEW-MELODY NEXT-METHOD]]
    [transit.util.random :refer [weighted-choice]]
    [transit.util.util :refer [remove-element-from-vector]]
    )
@@ -67,16 +67,31 @@
       )
   )
 
+(defn play-melody-event
+  [melody-event]
+  (println "*------------* play-melody-event *------------*")
+  (println melody-event)
+  melody-event
+  )
+
 (defn play-next-note
   [ensemble player-id event-time]
   (let [player (get-player ensemble player-id)
         melody (get-melody ensemble player-id)
         method-context [ensemble player melody player-id {:status NEXT-METHOD}]
-        [_ new-player new-melody player-id rtn]
+        [_ new-player new-melody player-id rtn-map]
         (first (filter (partial stop-running-methods? event-time)
                        (iterate run-player-method method-context)))
+        upd-melody (if (= (:status rtn-map) NEW-MELODY)
+                     (assoc new-melody
+                            (dec (count new-melody))
+                            (play-melody-event (last new-melody)))
+                     new-melody)
         ]
-    (update-player-and-melody new-player new-melody player-id)
+    (when (= (:status rtn-map) NEW-MELODY)
+      (play-melody-event (last new-melody))
+      )
+    (update-player-and-melody new-player upd-melody player-id)
     )
   (println (- (System/currentTimeMillis) event-time))
  )

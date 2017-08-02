@@ -23,12 +23,12 @@
 
 (defn get-melody
   [ensemble player-id]
-  (get (:melodies ensemble) player-id)
+  ((:melodies ensemble) player-id)
   )
 
 (defn get-player
   [ensemble player-id]
-  (get (:players ensemble) player-id)
+  ((:players ensemble) player-id)
   )
 
 (defn player-and-melody-update
@@ -45,13 +45,13 @@
  )
 
 (defn init-ensemble
-  [new-players]
+  [init-players init-melodies]
   (reset!
    ensemble
    {:players
-    (into {} (for [player new-players] [(:id player) player]))
+    (into [] init-players)
     :melodies
-    (zipmap (range (get-setting :num-players)) (repeat {}))
+    (into [] init-melodies)
     }
    )
   @ensemble

@@ -44,7 +44,11 @@
   ;; (select-random-note)
   ;; (select-random-volume
   ;; (select-random-rhythm)
-  [ensemble player melody player-id {:status NEW-MELODY}]
+  (let [next-id (inc (:id (last melody)))
+        new-melody (assoc melody (count melody) (assoc (last melody) :id next-id))
+        ]
+    [ensemble player new-melody player-id {:status NEW-MELODY}]
+    )
   )
 
 (defn play-next-note

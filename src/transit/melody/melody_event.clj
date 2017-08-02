@@ -19,10 +19,23 @@
    )
   )
 
-(defrecord MelodyEvent [id note dur-info instrument-info note-event-time note-play-time player-id sc-instrument-id volume])
+(defrecord MelodyEvent [id note dur-info volume instrument-info player-id event-time play-time sc-instrument-id])
 
 (defn create-melody-event
-  [& {:keys [:id note ]}]
+  [& {:keys [:id :note :dur-info :volume :instrument-info :player-id :event-time :play-time :sc-instrument-id]}]
   (MelodyEvent. id
+                note
+                dur-info
+                volume
+                instrument-info
+                player-id
+                event-time
+                nil  ;; :play-time
+                nil  ;; sc-instrument-id
                 )
   )
+
+(defn set-sc-instrument-id-and-play-time
+  [melody-event sc-instrument-id play-time]
+  (assoc melody-event :sc-instrument-id sc-instrument-id
+                      :play-time play-time))
