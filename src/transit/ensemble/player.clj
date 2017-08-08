@@ -47,3 +47,32 @@
 (defn get-player-instrument
   [player]
   (:instrument player))
+
+(defn print-player
+  "Pretty Print a player map
+
+  player - the player map to print"
+  [player & {:keys [prnt-full-inst-info]
+             :or {prnt-full-inst-info false}}]
+  (let [sorted-keys (sort (keys player))]
+    (println "player: " (get-player-id player) "current time: " (System/currentTimeMillis))
+    (doseq [player-key sorted-keys]
+      (cond
+        (= player-key :methods)
+        (do
+          (println " " player-key)
+          (doseq [method-info (get player :methods)]
+            (println "   " (type (method-info 0)) " weight: " (method-info 1))
+            ))
+        (and (= player-key :instrument-info) (= prnt-full-inst-info false))
+        (do
+          (println (format "%-29s" (str "  " player-key " :name")) "-" (:name (:instrument (:instrument-info player))))
+          (println (format "%-29s" (str "  " player-key " :range-lo")) "-" (:range-lo (:instrument-info player)))
+          (println (format "%-29s" (str "  " player-key " :range-hi")) "-" (:range-hi (:instrument-info player))))
+        :else
+        (println (format "%-20s" (str "  " player-key)) "-" (get player player-key)))
+      )
+    (println "end player: " (get-player-id player) "current time: " (System/currentTimeMillis))
+    (prn)
+    )
+  )

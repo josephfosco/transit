@@ -16,6 +16,7 @@
 (ns transit.ensemble.ensemble
   (:require
    [transit.config.config :refer [get-setting]]
+   [transit.ensemble.player :refer [print-player]]
    )
   )
 
@@ -61,3 +62,8 @@
   [ensemble]
 
   )
+
+(defn print-player-id
+ [player-id]
+ (print-player (get-player @ensemble player-id))
+ )

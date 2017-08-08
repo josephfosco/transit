@@ -116,8 +116,7 @@
     0.001))
 
 (defn select-random-instrument
-  "Selects random instrument-info for player.
-   Can be used the first time instrument-info is set."
+  "Selects random instrument-info for player."
   []
   (let [inst-info (rand-nth all-instruments)
         ]

@@ -41,11 +41,18 @@
 (defn play-random-note
   [[ensemble player melody player-id rtn-map]]
   (println "******  play-random-note  ******")
+  (println player)
   ;; (select-random-note)
   ;; (select-random-volume
   ;; (select-random-rhythm)
   (let [next-id (inc (:id (last melody)))
-        new-melody (assoc melody (count melody) (assoc (last melody) :id next-id))
+        new-melody (assoc melody
+                          (count melody)
+                          (assoc (last melody)
+                                 :id next-id
+                                 :instrument-info (:instrument player)
+                                 :player-id player-id
+                                 ))
         ]
     [ensemble player new-melody player-id {:status NEW-MELODY}]
     )

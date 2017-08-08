@@ -35,7 +35,10 @@
                 )
   )
 
-(defn set-sc-instrument-id-and-play-time
-  [melody-event sc-instrument-id play-time]
-  (assoc melody-event :sc-instrument-id sc-instrument-id
-                      :play-time play-time))
+(defn set-sc-instrument-id-and-times
+  [melody-event sc-instrument-id event-time play-time]
+  (assoc melody-event
+         :event-time event-time
+         :play-time play-time
+         :sc-instrument-id sc-instrument-id
+         ))
