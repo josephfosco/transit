@@ -60,7 +60,9 @@
 
 (defn print-ensemble
   [ensemble]
-
+  (doseq [player (:players ensemble)]
+    (print-player player)
+    )
   )
 
 (defn print-player-id
