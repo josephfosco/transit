@@ -42,3 +42,17 @@
          :play-time play-time
          :sc-instrument-id sc-instrument-id
          ))
+
+(defn print-melody-event
+  [melody-event]
+  (let [inst-inf (:instrument-info melody-event)
+        melody-map (into (sorted-map)
+                         (assoc melody-event
+                                :instrument-info {:name (:name inst-inf)
+                                                  :range-lo (:range-lo inst-inf)
+                                                  :range-hi (:range-hi inst-inf)}
+                                ))
+        ]
+    (println melody-map)
+    )
+  )

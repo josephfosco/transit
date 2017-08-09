@@ -17,6 +17,7 @@
   (:require
    [transit.config.config :refer [get-setting]]
    [transit.ensemble.player :refer [print-player]]
+   [transit.melody.melody-event :refer [print-melody-event]]
    )
   )
 
@@ -69,3 +70,11 @@
  [player-id]
  (print-player (get-player @ensemble player-id))
  )
+
+(defn print-melody-for-player-id
+  [player-id]
+  (let [plyr-melody ((:melodies @ensemble) player-id)]
+    (doseq [melody-event plyr-melody]
+      (print-melody-event melody-event))
+    )
+  )

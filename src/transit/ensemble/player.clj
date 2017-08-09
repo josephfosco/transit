@@ -20,7 +20,7 @@
    )
   )
 
-(defrecord Player [id key mm instrument methods sampled-melodies])
+(defrecord Player [id key mm instrument-info methods sampled-melodies])
 
 (defn get-initial-player-methods
   []
@@ -44,9 +44,9 @@
   [player]
   (:id player))
 
-(defn get-player-instrument
+(defn get-player-instrument-info
   [player]
-  (:instrument player))
+  (:instrument-info player))
 
 (defn print-player
   "Pretty Print a player map

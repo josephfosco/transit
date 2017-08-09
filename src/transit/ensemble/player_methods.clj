@@ -80,11 +80,11 @@
         new-instrument (choose-instrument args)
         new-player (if add-play-random-note-method?
                      (assoc player
-                            :instrument new-instrument
+                            :instrument-info new-instrument
                             :methods (conj cur-methods [play-random-note 10])
                             )
                      (assoc player
-                            :instrument new-instrument
+                            :instrument-info new-instrument
                             )
                      )
 
