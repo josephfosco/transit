@@ -16,8 +16,8 @@
 (ns transit.ensemble.ensemble
   (:require
    [transit.config.config :refer [get-setting]]
-   [transit.ensemble.player :refer [print-player]]
    [transit.melody.melody-event :refer [print-melody-event]]
+   [transit.player.player :refer [print-player]]
    )
   )
 
@@ -60,10 +60,12 @@
   )
 
 (defn print-ensemble
-  [ensemble]
-  (doseq [player (:players ensemble)]
-    (print-player player)
-    )
+  ([] (print-ensemble @ensemble))
+  ([ensemble]
+   (doseq [player (:players ensemble)]
+     (print-player player)
+     )
+   )
   )
 
 (defn print-player-id

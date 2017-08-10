@@ -13,12 +13,12 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.ensemble.player-play-note
+(ns transit.player.player-play-note
   (:require
    [transit.ensemble.ensemble :refer [get-melody get-player
                                       update-player-and-melody]]
-   [transit.ensemble.player-methods :refer [NEW-MELODY NEXT-METHOD]]
    [transit.melody.melody-event :refer [set-sc-instrument-id-and-times]]
+   [transit.player.player-methods :refer [NEW-MELODY NEXT-METHOD]]
    [transit.util.random :refer [weighted-choice]]
    [transit.util.util :refer [remove-element-from-vector]]
    )

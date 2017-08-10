@@ -13,10 +13,11 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.ensemble.player-methods
+(ns transit.player.player-methods
   (:require
    [transit.instr.instrument :refer [select-random-instrument]]
    [transit.melody.melody-event :refer [create-melody-event]]
+   [transit.melody.pitch :refer [select-random-pitch]]
    )
   )
 
@@ -42,23 +43,22 @@
 (defn play-random-note
   [[ensemble player melody player-id rtn-map]]
   (println "******  play-random-note  ******")
-  (println player)
-  (println (:instrument-info player))
-  ;; (select-random-note)
   ;; (select-random-volume
   ;; (select-random-rhythm)
   (let [next-id (inc (:id (last melody)))
+        inst-inf (:instrument-info player)
         new-melody (assoc
                     melody
                     (count melody)
                     (create-melody-event
                      :id next-id
-                     :note nil
-                     :dir-info nil
+                     :note (select-random-pitch (:range-lo inst-inf)
+                                                (:range-hi inst-inf))
+                     :dur-info nil
                      :volume nil
                      :instrument-info (:instrument-info player)
                      :player-id player-id
-                     :event-time nil?
+                     :event-time nil
                      )
                     )
         ]

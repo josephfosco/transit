@@ -13,9 +13,9 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.ensemble.player
+(ns transit.player.player
   (:require
-   [transit.ensemble.player-methods :refer [listen monitor-silence
+   [transit.player.player-methods :refer [listen monitor-silence
                                             play-random-note select-instrument]]
    )
   )
