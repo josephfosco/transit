@@ -13,11 +13,7 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.melody.melody-event
-  (:require
-   [transit.ensemble.ensemble :refer [get-player]]
-   )
-  )
+(ns transit.melody.melody-event)
 
 (defrecord MelodyEvent [id note dur-info volume instrument-info player-id event-time play-time sc-instrument-id])
 
@@ -47,11 +43,13 @@
   [melody-event]
   (let [inst-inf (:instrument-info melody-event)
         melody-map (into (sorted-map)
-                         (assoc melody-event
-                                :instrument-info {:name (:name inst-inf)
-                                                  :range-lo (:range-lo inst-inf)
-                                                  :range-hi (:range-hi inst-inf)}
-                                ))
+                         (assoc
+                          melody-event
+                          :instrument-info
+                          {:name (:name (:instrument inst-inf))
+                           :range-lo (:range-lo inst-inf)
+                           :range-hi (:range-hi inst-inf)}
+                          ))
         ]
     (println melody-map)
     )

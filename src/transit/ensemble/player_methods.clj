@@ -16,6 +16,7 @@
 (ns transit.ensemble.player-methods
   (:require
    [transit.instr.instrument :refer [select-random-instrument]]
+   [transit.melody.melody-event :refer [create-melody-event]]
    )
   )
 
@@ -42,17 +43,24 @@
   [[ensemble player melody player-id rtn-map]]
   (println "******  play-random-note  ******")
   (println player)
+  (println (:instrument-info player))
   ;; (select-random-note)
   ;; (select-random-volume
   ;; (select-random-rhythm)
   (let [next-id (inc (:id (last melody)))
-        new-melody (assoc melody
-                          (count melody)
-                          (assoc (last melody)
-                                 :id next-id
-                                 :instrument-info (:instrument player)
-                                 :player-id player-id
-                                 ))
+        new-melody (assoc
+                    melody
+                    (count melody)
+                    (create-melody-event
+                     :id next-id
+                     :note nil
+                     :dir-info nil
+                     :volume nil
+                     :instrument-info (:instrument-info player)
+                     :player-id player-id
+                     :event-time nil?
+                     )
+                    )
         ]
     [ensemble player new-melody player-id {:status NEW-MELODY}]
     )
