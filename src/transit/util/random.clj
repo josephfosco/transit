@@ -21,10 +21,6 @@
   [lo hi]
   (+ (rand-int (inc (- hi lo)))lo))
 
-(defn random-dur
-  [lo-millis hi-millis]
-  (random-int lo-millis hi-millis))
-
 (defn weighted-choice
   "Makes a random selection based on a vector of weights.
    Returns the index into the vector of the selection

@@ -19,6 +19,7 @@
    [transit.melody.melody-event :refer [create-melody-event]]
    [transit.melody.pitch :refer [select-random-pitch]]
    [transit.melody.rhythm :refer [select-random-rhythm]]
+   [transit.melody.volume :refer [select-random-volume]]
    )
   )
 
@@ -39,8 +40,6 @@
 (defn play-random-note
   [[ensemble player melody player-id rtn-map]]
   (println "******  play-random-note  ******")
-  ;; (select-random-volume
-  ;; (select-random-rhythm)
   (let [next-id (inc (:id (last melody)))
         inst-inf (:instrument-info player)
         new-melody (assoc
@@ -51,7 +50,7 @@
                      :note (select-random-pitch (:range-lo inst-inf)
                                                 (:range-hi inst-inf))
                      :dur-info (select-random-rhythm)
-                     :volume nil
+                     :volume (select-random-volume)
                      :instrument-info (:instrument-info player)
                      :player-id player-id
                      :event-time nil
