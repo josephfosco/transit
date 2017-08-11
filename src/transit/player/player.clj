@@ -16,7 +16,8 @@
 (ns transit.player.player
   (:require
    [transit.player.player-methods :refer [listen monitor-silence
-                                            play-random-note select-instrument]]
+                                          play-random-note
+                                          select-new-instrument]]
    )
   )
 
@@ -25,7 +26,7 @@
 (defn get-initial-player-methods
   []
   [
-   [select-instrument 1] [monitor-silence 1] [listen 1]
+   [select-new-instrument 1] [monitor-silence 1] [listen 1]
    ]
   )
 

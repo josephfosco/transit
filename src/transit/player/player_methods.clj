@@ -15,9 +15,10 @@
 
 (ns transit.player.player-methods
   (:require
-   [transit.instr.instrument :refer [select-random-instrument]]
+   [transit.instr.instrument :refer [select-instrument]]
    [transit.melody.melody-event :refer [create-melody-event]]
    [transit.melody.pitch :refer [select-random-pitch]]
+   [transit.melody.rhythm :refer [select-random-rhythm]]
    )
   )
 
@@ -25,11 +26,6 @@
 (def CONTINUE 1)  ;; Processing complete - do not call additional methods
 (def NEW-MELODY 2)  ;; Processing complete - last melody event is new
 (def NEXT-METHOD 3)  ;; Select and call another method
-
-(defn choose-instrument
-  [[ensemble player melody player-id]]
-  (select-random-instrument)
-  )
 
 
 ;; --------------------------------------------------
@@ -54,7 +50,7 @@
                      :id next-id
                      :note (select-random-pitch (:range-lo inst-inf)
                                                 (:range-hi inst-inf))
-                     :dur-info nil
+                     :dur-info (select-random-rhythm)
                      :volume nil
                      :instrument-info (:instrument-info player)
                      :player-id player-id
@@ -80,12 +76,12 @@
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
-(defn select-instrument
+(defn select-new-instrument
   [[ensemble player melody player-id rtn-map :as args]]
-  (println "******  select-instrument  ******")
+  (println "******  select-new-instrument  ******")
   (let [cur-methods (:methods player)
         add-play-random-note-method? (nil? (:instrument player))
-        new-instrument (choose-instrument args)
+        new-instrument (select-instrument args)
         new-player (if add-play-random-note-method?
                      (assoc player
                             :instrument-info new-instrument

@@ -128,6 +128,11 @@
      :range-lo (get-range-lo-for-inst-info inst-info))
     ))
 
+(defn select-instrument
+  [[ensemble player melody player-id]]
+  (select-random-instrument)
+  )
+
 ;; (defn select-instrument
 ;;   "Selects instrument-info for player.
 

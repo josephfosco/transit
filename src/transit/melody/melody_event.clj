@@ -49,6 +49,8 @@
                           {:name (:name (:instrument inst-inf))
                            :range-lo (:range-lo inst-inf)
                            :range-hi (:range-hi inst-inf)}
+                          :dur-info
+                          (into {} (:dur-info melody-event))
                           ))
         ]
     (println melody-map)
