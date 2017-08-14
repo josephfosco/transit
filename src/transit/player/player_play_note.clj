@@ -15,9 +15,14 @@
 
 (ns transit.player.player-play-note
   (:require
+   [overtone.live :refer [midi->hz]]
+   [transit.instr.instrumentinfo :refer [get-instrument-from-instrument-info]]
    [transit.ensemble.ensemble :refer [get-melody get-player
                                       update-player-and-melody]]
-   [transit.melody.melody-event :refer [set-sc-instrument-id-and-times]]
+   [transit.melody.melody-event :refer [get-instrument-info-from-melody-event
+                                        get-note-from-melody-event
+                                        get-volume-from-melody-event
+                                        set-sc-instrument-id-and-times]]
    [transit.player.player-methods :refer [NEW-MELODY NEXT-METHOD]]
    [transit.util.random :refer [weighted-choice]]
    [transit.util.util :refer [remove-element-from-vector]]
@@ -72,7 +77,18 @@
   [melody-event event-time]
   (println "*------------* play-melody-event *------------*")
   (println melody-event)
-  (set-sc-instrument-id-and-times melody-event nil event-time nil)
+  (let [note (get-note-from-melody-event melody-event)
+        cur-inst-id ((get-instrument-from-instrument-info
+                      (get-instrument-info-from-melody-event melody-event))
+                     (midi->hz (get-note-from-melody-event melody-event))
+                     (get-volume-from-melody-event melody-event)
+                     )
+        ]
+    (set-sc-instrument-id-and-times melody-event
+                                    cur-inst-id
+                                    event-time
+                                    (System/currentTimeMillis))
+    )
   )
 
 (defn play-next-note

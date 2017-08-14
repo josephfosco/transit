@@ -39,6 +39,21 @@
          :sc-instrument-id sc-instrument-id
          ))
 
+(defn get-instrument-info-from-melody-event
+ [melody-event]
+ (:instrument-info melody-event)
+ )
+
+(defn get-note-from-melody-event
+ [melody-event]
+ (:note melody-event)
+ )
+
+(defn get-volume-from-melody-event
+ [melody-event]
+ (:volume melody-event)
+ )
+
 (defn print-melody-event
   [melody-event]
   (let [inst-inf (:instrument-info melody-event)

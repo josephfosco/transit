@@ -18,7 +18,13 @@
    [overtone.live :refer :all]
    ;; [transit.constants :refer :all]
 ;;   [transit.ensemble.player :refer [get-player-id]]
-   [transit.instr.instrumentinfo :refer :all]
+   [transit.instr.instrumentinfo :refer [create-instrument-info
+                                         get-instrument-from-instrument-info
+                                         get-envelope-type-from-instrument-info
+                                         get-range-hi-from-instrument-info
+                                         get-range-lo-from-instrument-info
+                                         get-release-dur-from-instrument-info
+                                         ]]
    [transit.instr.instruments.elec-instruments :refer :all]
    [transit.instr.instruments.misc-instruments :refer :all]
    [transit.instr.instruments.osc-instruments :refer :all]
@@ -121,11 +127,11 @@
   (let [inst-info (rand-nth all-instruments)
         ]
     (create-instrument-info
-     :instrument (get-instrument-for-inst-info inst-info)
-     :envelope-type (get-envelope-type-for-inst-info inst-info)
-     :release-dur (get-release-dur-for-inst-info inst-info)
-     :range-hi (get-range-hi-for-inst-info inst-info)
-     :range-lo (get-range-lo-for-inst-info inst-info))
+     :instrument (get-instrument-from-instrument-info inst-info)
+     :envelope-type (get-envelope-type-from-instrument-info inst-info)
+     :release-dur (get-release-dur-from-instrument-info inst-info)
+     :range-hi (get-range-hi-from-instrument-info inst-info)
+     :range-lo (get-range-lo-from-instrument-info inst-info))
     ))
 
 (defn select-instrument
