@@ -1,4 +1,4 @@
-;    Copyright (C) 2017  Joseph Fosco. All Rights Reserved
+;    Copyright (C) 2014-2017  Joseph Fosco. All Rights Reserved
 ;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -13,14 +13,12 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.melody.dur-info)
+(ns transit.instr.sc-instrument
+  (:require
+   [overtone.live :refer :all]
+   ))
 
-(defrecord DurInfo [dur-millis dur-beats])
-
-(defn get-dur-millis-from-dur-info
-  [dur-info]
-  (:dur-millis dur-info))
-
-(defn get-dur-beats-from-dur-info
-  [dur-info]
-  (:dur-beats dur-info))
+(defn stop-instrument
+  [sc-instrument-id]
+  (ctl sc-instrument-id :gate 0)
+  )

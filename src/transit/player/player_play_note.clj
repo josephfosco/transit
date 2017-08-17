@@ -16,11 +16,18 @@
 (ns transit.player.player-play-note
   (:require
    [overtone.live :refer [midi->hz]]
-   [transit.instr.instrumentinfo :refer [get-instrument-from-instrument-info]]
+   [transit.instr.instrumentinfo :refer [get-release-millis-from-instrument-info
+                                         get-instrument-from-instrument-info]]
+   [transit.instr.sc-instrument :refer [stop-instrument]]
+   [transit.config.config :refer [get-setting]]
    [transit.ensemble.ensemble :refer [get-melody get-player
                                       update-player-and-melody]]
-   [transit.melody.melody-event :refer [get-instrument-info-from-melody-event
+   [transit.melody.dur-info :refer [get-dur-millis-from-dur-info]]
+   [transit.melody.melody-event :refer [get-dur-info-from-melody-event
+                                        get-instrument-info-from-melody-event
                                         get-note-from-melody-event
+                                        get-note-off-from-melody-event
+                                        get-sc-instrument-id-from-melody-event
                                         get-volume-from-melody-event
                                         set-sc-instrument-id-and-times]]
    [transit.player.player-methods :refer [NEW-MELODY NEXT-METHOD]]
@@ -40,6 +47,24 @@
    false - if player is not playing now
  "
  [player]
+  )
+
+(defn sched-note-off?
+  "If this is not a rest and
+    this note has a release
+    the note length > release
+  then return true
+  else return false"
+  [melody-event]
+
+  (if (and (not (nil? (get-note-from-melody-event melody-event)))
+           (> (get-release-millis-from-instrument-info
+               (get-instrument-info-from-melody-event melody-event))
+              (get-dur-millis-from-dur-info
+               (get-dur-info-from-melody-event melody-event)))
+           )
+    true
+    false)
   )
 
 (defn select-method
@@ -66,6 +91,25 @@
      )
   )
 
+(defn check-prior-event-note-off
+   " if the prior note was not turned off and
+       either this note is a rest or
+         this note has a different instrument than the prior note
+     then
+       turn off the prior note"
+  [prior-melody-event cur-melody-event]
+  (when (and (false? (get-note-off-from-melody-event prior-melody-event))
+             (or (not (nil? (get-note-from-melody-event cur-melody-event)))
+                 (not=
+                  (get-sc-instrument-id-from-melody-event prior-melody-event)
+                  (get-sc-instrument-id-from-melody-event cur-melody-event)
+                  )
+                 )
+             )
+    (stop-instrument (get-sc-instrument-id-from-melody-event prior-melody-event))
+    )
+  )
+
 (defn stop-running-methods?
   [event_time [_ player melody player-id rtn-map]]
   (or (= 0 (count (:methods player )))
@@ -78,16 +122,21 @@
   (println "*------------* play-melody-event *------------*")
   (println melody-event)
   (let [note (get-note-from-melody-event melody-event)
+        ;; the following line plays the note
         cur-inst-id ((get-instrument-from-instrument-info
                       (get-instrument-info-from-melody-event melody-event))
                      (midi->hz (get-note-from-melody-event melody-event))
-                     (get-volume-from-melody-event melody-event)
+                     (* (get-volume-from-melody-event melody-event)
+                        (get-setting :volume-adjust))
                      )
-        ]
-    (set-sc-instrument-id-and-times melody-event
-                                    cur-inst-id
-                                    event-time
-                                    (System/currentTimeMillis))
+        full-melody-event (set-sc-instrument-id-and-times melody-event
+                                                          cur-inst-id
+                                                          event-time
+                                                          (System/currentTimeMillis))
+        note-off?? (sched-note-off? full-melody-event)
+
+          ]
+       full-melody-event
     )
   )
 
@@ -105,6 +154,7 @@
                             (play-melody-event (last new-melody) event-time))
                      new-melody)
         ]
+    (check-prior-event-note-off (last melody) upd-melody)
     (update-player-and-melody new-player upd-melody player-id)
     )
   (println (- (System/currentTimeMillis) event-time))

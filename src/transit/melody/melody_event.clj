@@ -15,10 +15,19 @@
 
 (ns transit.melody.melody-event)
 
-(defrecord MelodyEvent [id note dur-info volume instrument-info player-id event-time play-time sc-instrument-id])
+(defrecord MelodyEvent [id note dur-info volume instrument-info player-id event-time play-time sc-instrument-id note-off])
+
+;; MelodyEvent fields
+;;  id   - id sequence of melody event - 0 is initial blank event
+;;  note - note number of event - nil for rest
+;;  event-time - time (in millis) event was supposed to be played
+;;  play-time  - time (in millis) event was actually played
+;;  note-off - true if a note-off was scheduled for this event note
+;;             false if note-off event was not scheduled for this note
+;;             nil if this event is a rest (note = nil)
 
 (defn create-melody-event
-  [& {:keys [:id :note :dur-info :volume :instrument-info :player-id :event-time :play-time :sc-instrument-id]}]
+  [& {:keys [:id :note :dur-info :volume :instrument-info :player-id :event-time :play-time :sc-instrument-id :note-off]}]
   (MelodyEvent. id
                 note
                 dur-info
@@ -28,6 +37,7 @@
                 event-time
                 nil  ;; :play-time
                 nil  ;; sc-instrument-id
+                note-off
                 )
   )
 
@@ -39,6 +49,11 @@
          :sc-instrument-id sc-instrument-id
          ))
 
+(defn get-dur-info-from-melody-event
+ [melody-event]
+ (:dur-info melody-event)
+ )
+
 (defn get-instrument-info-from-melody-event
  [melody-event]
  (:instrument-info melody-event)
@@ -47,6 +62,16 @@
 (defn get-note-from-melody-event
  [melody-event]
  (:note melody-event)
+ )
+
+(defn get-note-off-from-melody-event
+ [melody-event]
+ (:note-off melody-event)
+ )
+
+(defn get-sc-instrument-id-from-melody-event
+ [melody-event]
+ (:sc-instrument-id melody-event)
  )
 
 (defn get-volume-from-melody-event

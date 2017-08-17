@@ -15,8 +15,9 @@
 
 (ns transit.player.player-methods
   (:require
-   [transit.instr.instrument :refer [select-instrument]]
-   [transit.melody.melody-event :refer [create-melody-event]]
+   [transit.instr.instrument :refer [has-release? select-instrument]]
+   [transit.melody.melody-event :refer [create-melody-event
+                                        get-note-from-melody-event]]
    [transit.melody.pitch :refer [select-random-pitch]]
    [transit.melody.rhythm :refer [select-random-rhythm]]
    [transit.melody.volume :refer [select-random-volume]]
@@ -54,6 +55,7 @@
                      :instrument-info (:instrument-info player)
                      :player-id player-id
                      :event-time nil
+                     :note-off nil
                      )
                     )
         ]

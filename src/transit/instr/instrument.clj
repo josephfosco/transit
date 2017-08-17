@@ -105,14 +105,6 @@
   [music-note]
   (midi->hz music-note))
 
-(defn get-instrument-range-hi
-  [instrument-info]
-  (:range-hi instrument-info))
-
-(defn get-instrument-range-lo
-  [instrument-info]
-  (:range-lo instrument-info))
-
 (defn get-gate-dur
   "player - player map
    note-duration - note duration in milliseconds"
