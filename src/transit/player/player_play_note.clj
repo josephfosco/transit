@@ -49,25 +49,6 @@
  [player]
   )
 
-(defn sched-note-off?
-  "If this is not a rest and
-    this note has a release
-    the note length > release
-  then return true
-  else return false"
-  [melody-event]
-
-  (if (and (not (nil? (get-note-from-melody-event melody-event)))
-           (> (get-dur-millis-from-dur-info
-               (get-dur-info-from-melody-event melody-event))
-              (get-release-millis-from-instrument-info
-               (get-instrument-info-from-melody-event melody-event))
-              )
-           )
-    true
-    false)
-  )
-
 (defn select-method
   " Returns the ndx into player-methods of the method to run "
   [player]
@@ -150,10 +131,15 @@
               :else
               (play-note-prior-instrument prior-melody-event melody-event)
               )
-        note-off?
-        (sched-note-off? melody-event)
+        full-melody-event (set-play-info melody-event
+                                         cur-inst-id
+                                         event-time
+                                         (System/currentTimeMillis)
+                                         )
+
         ]
-    (when note-off?
+    ;; schedule note-off for melody-event
+    (when (get-note-off-from-melody-event full-melody-event)
       (apply-at (+ event-time
                    (- (get-dur-millis-from-dur-info
                        (get-dur-info-from-melody-event melody-event))
@@ -164,11 +150,7 @@
                 [cur-inst-id]
                 )
       )
-    (set-play-info melody-event
-                   cur-inst-id
-                   event-time
-                   (System/currentTimeMillis)
-                   note-off?)
+    full-melody-event
     )
   )
 

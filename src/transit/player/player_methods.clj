@@ -55,7 +55,6 @@
                      :instrument-info (:instrument-info player)
                      :player-id player-id
                      :event-time nil
-                     :note-off nil
                      )
                     )
         ]

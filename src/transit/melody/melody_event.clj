@@ -13,7 +13,12 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.melody.melody-event)
+(ns transit.melody.melody-event
+  (:require
+   [transit.melody.dur-info :refer [get-dur-millis-from-dur-info]]
+   [transit.instr.instrumentinfo :refer [get-release-millis-from-instrument-info]]
+   )
+  )
 
 (defrecord MelodyEvent [id note dur-info volume instrument-info player-id event-time play-time sc-instrument-id note-off])
 
@@ -26,8 +31,25 @@
 ;;             false if note-off event was not scheduled for this note
 ;;             nil if this event is a rest (note = nil)
 
+(defn sched-note-off?
+  "If this is not a rest and
+    this note has a release
+    the note length > release
+  then return true
+  else return false"
+  [note dur-info instrument-info]
+
+  (if (and (not (nil? note))
+           (> (get-dur-millis-from-dur-info dur-info)
+              (get-release-millis-from-instrument-info instrument-info)
+              )
+           )
+    true
+    false)
+  )
+
 (defn create-melody-event
-  [& {:keys [:id :note :dur-info :volume :instrument-info :player-id :event-time :play-time :sc-instrument-id :note-off]}]
+  [& {:keys [:id :note :dur-info :volume :instrument-info :player-id :event-time :play-time :sc-instrument-id]}]
   (MelodyEvent. id
                 note
                 dur-info
@@ -37,17 +59,18 @@
                 event-time
                 nil  ;; :play-time
                 nil  ;; sc-instrument-id
-                note-off
+                (if (nil? note)  ;; set note-off based on other params
+                  nil
+                  (sched-note-off? note dur-info instrument-info))
                 )
   )
 
 (defn set-play-info
-  [melody-event sc-instrument-id event-time play-time note-off]
+  [melody-event sc-instrument-id event-time play-time]
   (assoc melody-event
          :event-time event-time
          :play-time play-time
          :sc-instrument-id sc-instrument-id
-         :note-off note-off
          ))
 
 (defn get-dur-info-from-melody-event
