@@ -15,7 +15,7 @@
 
 (ns transit.player.player-play-note
   (:require
-   [overtone.live :refer [midi->hz]]
+   [overtone.live :refer [apply-at ctl midi->hz]]
    [transit.instr.instrumentinfo :refer [get-release-millis-from-instrument-info
                                          get-instrument-from-instrument-info]]
    [transit.instr.sc-instrument :refer [stop-instrument]]
@@ -29,7 +29,7 @@
                                         get-note-off-from-melody-event
                                         get-sc-instrument-id-from-melody-event
                                         get-volume-from-melody-event
-                                        set-sc-instrument-id-and-times]]
+                                        set-play-info]]
    [transit.player.player-methods :refer [NEW-MELODY NEXT-METHOD]]
    [transit.util.random :refer [weighted-choice]]
    [transit.util.util :refer [remove-element-from-vector]]
@@ -58,10 +58,11 @@
   [melody-event]
 
   (if (and (not (nil? (get-note-from-melody-event melody-event)))
-           (> (get-release-millis-from-instrument-info
+           (> (get-dur-millis-from-dur-info
+               (get-dur-info-from-melody-event melody-event))
+              (get-release-millis-from-instrument-info
                (get-instrument-info-from-melody-event melody-event))
-              (get-dur-millis-from-dur-info
-               (get-dur-info-from-melody-event melody-event)))
+              )
            )
     true
     false)
@@ -117,26 +118,57 @@
       )
   )
 
+(defn play-note-prior-instrument
+  [prior-melody-event melody-event]
+  (let [inst-id (get-sc-instrument-id-from-melody-event prior-melody-event)]
+    (ctl inst-id
+         :freq (midi->hz (get-note-from-melody-event melody-event))
+         :vol (* (get-volume-from-melody-event melody-event)
+                 (get-setting :volume-adjust))
+         )
+    inst-id
+    )
+  )
+
+(defn play-note-new-instrument
+  [melody-event]
+  ((get-instrument-from-instrument-info
+    (get-instrument-info-from-melody-event melody-event))
+   (midi->hz (get-note-from-melody-event melody-event))
+   (* (get-volume-from-melody-event melody-event) (get-setting :volume-adjust)))
+  )
+
 (defn play-melody-event
-  [melody-event event-time]
+  [prior-melody-event melody-event event-time]
   (println "*------------* play-melody-event *------------*")
   (println melody-event)
-  (let [note (get-note-from-melody-event melody-event)
-        ;; the following line plays the note
-        cur-inst-id ((get-instrument-from-instrument-info
-                      (get-instrument-info-from-melody-event melody-event))
-                     (midi->hz (get-note-from-melody-event melody-event))
-                     (* (get-volume-from-melody-event melody-event)
-                        (get-setting :volume-adjust))
-                     )
-        full-melody-event (set-sc-instrument-id-and-times melody-event
-                                                          cur-inst-id
-                                                          event-time
-                                                          (System/currentTimeMillis))
-        note-off?? (sched-note-off? full-melody-event)
-
-          ]
-       full-melody-event
+  (let [cur-inst-id
+        (cond (nil? (get-note-from-melody-event melody-event))
+              nil
+              (not (false? (get-note-off-from-melody-event prior-melody-event)))
+              (play-note-new-instrument melody-event)
+              :else
+              (play-note-prior-instrument prior-melody-event melody-event)
+              )
+        note-off?
+        (sched-note-off? melody-event)
+        ]
+    (when note-off?
+      (apply-at (+ event-time
+                   (- (get-dur-millis-from-dur-info
+                       (get-dur-info-from-melody-event melody-event))
+                      (get-release-millis-from-instrument-info
+                       (get-instrument-info-from-melody-event melody-event))
+                      ))
+                stop-instrument
+                [cur-inst-id]
+                )
+      )
+    (set-play-info melody-event
+                   cur-inst-id
+                   event-time
+                   (System/currentTimeMillis)
+                   note-off?)
     )
   )
 
@@ -151,7 +183,7 @@
         upd-melody (if (= (:status rtn-map) NEW-MELODY)
                      (assoc new-melody
                             (dec (count new-melody))
-                            (play-melody-event (last new-melody) event-time))
+                            (play-melody-event (last melody) (last new-melody) event-time))
                      new-melody)
         ]
     (check-prior-event-note-off (last melody) upd-melody)

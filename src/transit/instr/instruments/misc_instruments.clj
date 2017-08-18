@@ -21,11 +21,11 @@
 
 
 (definst bass-m1
-  [freq 440 amp 0.4 gate 1.0 action FREE]
+  [freq 440 vol 0.4 gate 1.0 action FREE]
   (-> (saw freq)
       (rlpf (line:kr 2000 freq 0.5) 0.5)
-      (* (env-gen (perc 0.1 0.5) gate amp 0 1 action))
-      (* amp)
+      (* (env-gen (perc 0.1 0.5) gate vol 0 1 action))
+      (* vol)
       )
   )
 
@@ -42,23 +42,23 @@
   )
 
 (definst drum-m1
-  [freq 440 amp 0.4 gate 1.0 action FREE]
+  [freq 440 vol 0.4 gate 1.0 action FREE]
   (-> (line:kr freq (* freq 1/2) 0.5)
       sin-osc
       (+ (sin-osc freq))
       (+ (sin-osc (/ freq 2) (sin-osc 1)))
-      (* (env-gen (perc 0.01 0.1) gate (* amp 0.4) :action action))
+      (* (env-gen (perc 0.01 0.1) gate (* vol 0.4) :action action))
       )
   )
 
 (definst plink-m1
-  [freq 440 amp 0.4 gate 1.0 action FREE]
+  [freq 440 vol 0.4 gate 1.0 action FREE]
   (-> (sin-osc freq)
       (+ (* 1/3 (sin-osc (* freq 3))))
       (+ (* 1/5 (sin-osc (* freq 5.1))))
       (+ (* 1/6 (sin-osc (* freq 6.1))))
       (+ (* 1/8 (sin-osc (* freq 7.1))))
       (+ (* 1/8 (sin-osc (* freq 8))))
-      (* (env-gen (perc 0.01 0.3) gate (* amp 0.3) 0 1 action))
+      (* (env-gen (perc 0.01 0.3) gate (* vol 0.3) 0 1 action))
       )
   )

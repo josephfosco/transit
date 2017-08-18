@@ -41,12 +41,13 @@
                 )
   )
 
-(defn set-sc-instrument-id-and-times
-  [melody-event sc-instrument-id event-time play-time]
+(defn set-play-info
+  [melody-event sc-instrument-id event-time play-time note-off]
   (assoc melody-event
          :event-time event-time
          :play-time play-time
          :sc-instrument-id sc-instrument-id
+         :note-off note-off
          ))
 
 (defn get-dur-info-from-melody-event
