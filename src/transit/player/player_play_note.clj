@@ -20,7 +20,9 @@
                                          get-instrument-from-instrument-info]]
    [transit.instr.sc-instrument :refer [stop-instrument]]
    [transit.config.config :refer [get-setting]]
-   [transit.ensemble.ensemble :refer [get-melody get-player
+   [transit.ensemble.ensemble :refer [get-ensemble
+                                      get-melody
+                                      get-player
                                       update-player-and-melody]]
    [transit.melody.dur-info :refer [get-dur-millis-from-dur-info]]
    [transit.melody.melody-event :refer [get-dur-info-from-melody-event
@@ -119,6 +121,10 @@
    (* (get-volume-from-melody-event melody-event) (get-setting :volume-adjust)))
   )
 
+(defn sched-next-note
+  [melody-event]
+  )
+
 (defn play-melody-event
   [prior-melody-event melody-event event-time]
   (println "*------------* play-melody-event *------------*")
@@ -155,8 +161,9 @@
   )
 
 (defn play-next-note
-  [ensemble player-id event-time]
-  (let [player (get-player ensemble player-id)
+  [player-id event-time]
+  (let [ensemble (get-ensemble)
+        player (get-player ensemble player-id)
         melody (get-melody ensemble player-id)
         method-context [ensemble player melody player-id {:status NEXT-METHOD}]
         [_ new-player new-melody player-id rtn-map]
@@ -169,6 +176,7 @@
                      new-melody)
         ]
     (check-prior-event-note-off (last melody) upd-melody)
+    (sched-next-note upd-melody)
     (update-player-and-melody new-player upd-melody player-id)
     )
   (println (- (System/currentTimeMillis) event-time))

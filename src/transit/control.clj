@@ -53,15 +53,15 @@
   )
 
 (defn- play-first-note
-  [ensemble player-id]
-  (play-next-note ensemble player-id (now) )
+  [player-id]
+  (play-next-note player-id (now) )
   )
 
 (defn- start-playing
   "calls play-note the first time for every player in ensemble"
-  [ensemble]
+  []
   (println "********** start-playing ****************")
-  (dotimes [id (get-setting :num-players)] (play-first-note ensemble id))
+  (dotimes [id (get-setting :num-players)] (play-first-note id))
   )
 
 (defn start-transit
@@ -72,9 +72,9 @@
         init-melodies (map init-melody (range number-of-players))
         ]
     (set-setting :volume-adjust (min (/ 32 number-of-players) 1))
-    (-> (init-transit init-players init-melodies)
-        (start-playing)
-        )
+    (init-transit init-players init-melodies)
+    (start-playing)
+
     )
   )
 

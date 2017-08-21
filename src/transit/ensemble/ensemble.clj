@@ -23,6 +23,10 @@
 
 (def ^:private ensemble (atom nil))
 
+(defn get-ensemble
+  []
+  @ensemble)
+
 (defn get-melody
   [ensemble player-id]
   ((:melodies ensemble) player-id)
