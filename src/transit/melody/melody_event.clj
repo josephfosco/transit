@@ -15,7 +15,8 @@
 
 (ns transit.melody.melody-event
   (:require
-   [transit.melody.dur-info :refer [get-dur-millis-from-dur-info]]
+   [transit.melody.dur-info :refer [get-dur-millis-from-dur-info
+                                    get-dur-beats-from-dur-info]]
    [transit.instr.instrumentinfo :refer [get-release-millis-from-instrument-info]]
    )
   )
@@ -76,6 +77,21 @@
 (defn get-dur-info-from-melody-event
  [melody-event]
  (:dur-info melody-event)
+  )
+
+(defn get-dur-beats-from-melody-event
+  [melody-event]
+  (get-dur-beats-from-dur-info (get-dur-info-from-melody-event melody-event))
+  )
+
+(defn get-dur-millis-from-melody-event
+  [melody-event]
+  (get-dur-millis-from-dur-info (get-dur-info-from-melody-event melody-event))
+  )
+
+(defn get-event-time-from-melody-event
+ [melody-event]
+ (:event-time melody-event)
  )
 
 (defn get-instrument-info-from-melody-event
@@ -91,6 +107,11 @@
 (defn get-note-off-from-melody-event
  [melody-event]
  (:note-off melody-event)
+ )
+
+(defn get-player-id-from-melody-event
+ [melody-event]
+ (:player-id melody-event)
  )
 
 (defn get-sc-instrument-id-from-melody-event

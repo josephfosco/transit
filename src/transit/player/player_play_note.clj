@@ -26,9 +26,12 @@
                                       update-player-and-melody]]
    [transit.melody.dur-info :refer [get-dur-millis-from-dur-info]]
    [transit.melody.melody-event :refer [get-dur-info-from-melody-event
+                                        get-dur-millis-from-melody-event
+                                        get-event-time-from-melody-event
                                         get-instrument-info-from-melody-event
                                         get-note-from-melody-event
                                         get-note-off-from-melody-event
+                                        get-player-id-from-melody-event
                                         get-sc-instrument-id-from-melody-event
                                         get-volume-from-melody-event
                                         set-play-info]]
@@ -121,14 +124,20 @@
    (* (get-volume-from-melody-event melody-event) (get-setting :volume-adjust)))
   )
 
+(declare play-next-note)
 (defn sched-next-note
   [melody-event]
+  (let [next-time (+ (get-event-time-from-melody-event melody-event)
+                     (get-dur-millis-from-melody-event melody-event)
+                     )]
+    (apply-at next-time
+              play-next-note
+              [(get-player-id-from-melody-event melody-event) next-time]
+     ))
   )
 
 (defn play-melody-event
   [prior-melody-event melody-event event-time]
-  (println "*------------* play-melody-event *------------*")
-  (println melody-event)
   (let [cur-inst-id
         (cond (nil? (get-note-from-melody-event melody-event))
               nil
@@ -176,8 +185,8 @@
                      new-melody)
         ]
     (check-prior-event-note-off (last melody) upd-melody)
-    (sched-next-note upd-melody)
-    (update-player-and-melody new-player upd-melody player-id)
-    )
+    (when  (= (:status rtn-map) NEW-MELODY)
+      (sched-next-note (last upd-melody)))
+    (update-player-and-melody new-player upd-melody player-id))
   (println (- (System/currentTimeMillis) event-time))
  )
