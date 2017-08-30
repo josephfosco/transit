@@ -15,4 +15,9 @@
 
 (ns transit.core-test
   (:require [clojure.test :refer :all]
-            [transit.core :refer :all]))
+            [transit.core :refer :all]
+            [transit.player.player-play-note-test :refer :all]
+            [transit.player.player-methods-test :refer :all]
+            [transit.util.random-test :refer :all]
+            [transit.util.util-test :refer :all]
+            ))

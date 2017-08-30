@@ -19,6 +19,12 @@
    )
   )
 
+(defn select-random-key
+  "Returns a randow number between 0 - 11
+   to represent a key. 0=C"
+  []
+  (rand-int 12))
+
 (defn select-random-pitch
   [lo hi]
   (random-int lo hi))

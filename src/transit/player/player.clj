@@ -15,18 +15,29 @@
 
 (ns transit.player.player
   (:require
-   [transit.player.player-methods :refer [listen monitor-silence
-                                          play-random-note
-                                          select-new-instrument]]
+   [transit.player.player-methods :refer [listen
+                                          monitor-silence
+                                          play-random-rest
+                                          select-key
+                                          select-mm
+                                          select-instrument-for-player
+                                          select-scale
+                                          ]]
    )
   )
 
-(defrecord Player [id key mm instrument-info methods sampled-melodies])
+(defrecord Player [id key scale mm instrument-info methods sampled-melodies])
 
 (defn get-initial-player-methods
   []
   [
-   [select-new-instrument 1] [monitor-silence 1] [listen 1]
+   [listen 2]
+   [play-random-rest 2]
+   [monitor-silence 1]
+   [select-key 1]
+   [select-mm 1]
+   [select-instrument-for-player 3]
+   [select-scale 1]
    ]
   )
 
@@ -34,6 +45,7 @@
   [& {:keys [:id]}]
   (Player. id
            nil  ;; key
+           nil  ;; scale
            nil  ;; mm
            nil  ;; instrument
            (get-initial-player-methods)

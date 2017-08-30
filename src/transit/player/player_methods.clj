@@ -15,10 +15,11 @@
 
 (ns transit.player.player-methods
   (:require
-   [transit.instr.instrument :refer [has-release? select-instrument]]
+   [transit.instr.instrument :refer [select-instrument]]
    [transit.melody.melody-event :refer [create-melody-event
                                         get-note-from-melody-event]]
-   [transit.melody.pitch :refer [select-random-pitch]]
+   [transit.melody.pitch :refer [select-random-key
+                                 select-random-pitch]]
    [transit.melody.rhythm :refer [select-random-rhythm]]
    [transit.melody.volume :refer [select-random-volume]]
    )
@@ -28,6 +29,19 @@
 (def CONTINUE 1)  ;; Processing complete - do not call additional methods
 (def NEW-MELODY 2)  ;; Processing complete - last melody event is new
 (def NEXT-METHOD 3)  ;; Select and call another method
+
+(defn remove-methods
+  " remove methods from player
+    returns: a player with methods removed from :methods"
+  [player & methods]
+  (defn remove-meth?
+    [meth-vctr]
+    (not (some #(= (first meth-vctr) %) methods))
+    )
+
+  (assoc player
+         :methods (filter remove-meth? (:methods player)))
+  )
 
 
 ;; --------------------------------------------------
@@ -62,6 +76,38 @@
     )
   )
 
+(defn play-random-rest
+  [[ensemble player melody player-id rtn-map]]
+  (println "******  play-random-rest  ******")
+  (let [next-id (inc (:id (last melody)))
+        inst-inf (:instrument-info player)
+        new-melody (assoc
+                    melody
+                    (count melody)
+                    (create-melody-event
+                     :id next-id
+                     :note nil
+                     :dur-info (select-random-rhythm)
+                     :volume nil
+                     :instrument-info nil
+                     :player-id player-id
+                     :event-time nil
+                     )
+                    )
+        ]
+    [ensemble player new-melody player-id {:status NEW-MELODY}]
+    )
+  )
+
+(defn play-random
+  [[ensemble player melody player-id rtn-map]]
+  (println "******  play-random  ******")
+  (if (= (rand-int 2) 0)
+    (play-random-rest ensemble player melody player-id rtn-map)
+    (play-random-note ensemble player melody player-id rtn-map)
+    )
+  )
+
 (defn play-next-note
   "Use available information to select and play the next
    relevent note for this player"
@@ -76,16 +122,16 @@
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
-(defn select-new-instrument
+(defn select-instrument-for-player
   [[ensemble player melody player-id rtn-map :as args]]
-  (println "******  select-new-instrument  ******")
+  (println "******  select-instrument-for-player  ******")
   (let [cur-methods (:methods player)
-        add-play-random-note-method? (nil? (:instrument player))
+        add-play-random-method? (nil? (:instrument player))
         new-instrument (select-instrument args)
-        new-player (if add-play-random-note-method?
+        new-player (if add-play-random-method?
                      (assoc player
                             :instrument-info new-instrument
-                            :methods (conj cur-methods [play-random-note 10])
+                            :methods (conj cur-methods [play-random 10])
                             )
                      (assoc player
                             :instrument-info new-instrument
@@ -95,6 +141,28 @@
         ]
     [ensemble new-player melody player-id {:status NEXT-METHOD}]
     )
+  )
+
+(defn select-key
+  [[ensemble player melody player-id rtn-map]]
+  (println "******  select-key  ******")
+  [ensemble
+   (assoc player :key (select-random-key))
+   melody
+   player-id
+   {:status NEXT-METHOD}]
+  )
+
+(defn select-mm
+  [[ensemble player melody player-id rtn-map]]
+  (println "******  select-mm  ******")
+  [ensemble player melody player-id {:status CONTINUE}]
+  )
+
+(defn select-scale
+  [[ensemble player melody player-id rtn-map]]
+  (println "******  select-scale  ******")
+  [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn monitor-silence

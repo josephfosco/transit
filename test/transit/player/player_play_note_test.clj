@@ -13,12 +13,12 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.ensemble.player-play-note-test
+(ns transit.player.player-play-note-test
   (:use clojure.test
-        transit.ensemble.player-play-note
+        transit.player.player-play-note
         )
   (:require
-   [transit.ensemble.player-methods :refer [CONTINUE NEXT-METHOD]]
+   [transit.player.player-methods :refer [CONTINUE NEXT-METHOD]]
    )
   )
 

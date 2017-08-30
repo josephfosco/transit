@@ -14,7 +14,8 @@ A music improvisation program
 
 To run tests
   Start a REPL
-  Load all tests from the test directory
+  Load all tests from the test directory (you can do this
+    by loading test/transit/core_test.clj)
   (clojure.test/run-all-tests #"transit.*")
   
 To run tests in one namespace
