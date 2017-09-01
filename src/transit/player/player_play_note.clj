@@ -43,7 +43,7 @@
 
 (defn get-player-method
   [player ndx]
-  (first ((:methods player) ndx))
+  (:method ((:methods player) ndx))
   )
 
 (defn is-playing?
@@ -57,7 +57,7 @@
 (defn select-method
   " Returns the ndx into player-methods of the method to run "
   [player]
-  (weighted-choice (mapv second (:methods player)))
+  (weighted-choice (mapv :weight (:methods player)))
   )
 
 (defn run-player-method

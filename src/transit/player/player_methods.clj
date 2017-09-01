@@ -25,18 +25,25 @@
    )
   )
 
+(defrecord MethodInfo [method weight time])
+
 ;; method return values
 (def CONTINUE 1)  ;; Processing complete - do not call additional methods
 (def NEW-MELODY 2)  ;; Processing complete - last melody event is new
 (def NEXT-METHOD 3)  ;; Select and call another method
+
+(defn create-method-info
+  [method weight]
+  (MethodInfo. method weight (System/currentTimeMillis))
+  )
 
 (defn remove-methods
   " remove methods from player
     returns: a player with methods removed from :methods"
   [player & methods]
   (defn remove-meth?
-    [meth-vctr]
-    (not (some #(= (first meth-vctr) %) methods))
+    [meth-rec]
+    (not (some #(= (:method meth-rec) %) methods))
     )
 
   (assoc player
@@ -54,7 +61,7 @@
 
 (defn play-random-note
   [[ensemble player melody player-id rtn-map]]
-  (println "******  play-random-note  ******")
+  (println "******  play-random-note  ******" player-id)
   (let [next-id (inc (:id (last melody)))
         inst-inf (:instrument-info player)
         new-melody (assoc
@@ -78,7 +85,7 @@
 
 (defn play-random-rest
   [[ensemble player melody player-id rtn-map]]
-  (println "******  play-random-rest  ******")
+  (println "******  play-random-rest  ******" player-id)
   (let [next-id (inc (:id (last melody)))
         inst-inf (:instrument-info player)
         new-melody (assoc
@@ -101,10 +108,10 @@
 
 (defn play-random
   [[ensemble player melody player-id rtn-map]]
-  (println "******  play-random  ******")
+  (println "******  play-random  ******" player-id)
   (if (= (rand-int 2) 0)
-    (play-random-rest ensemble player melody player-id rtn-map)
-    (play-random-note ensemble player melody player-id rtn-map)
+    (play-random-rest [ensemble player melody player-id rtn-map])
+    (play-random-note [ensemble player melody player-id rtn-map])
     )
   )
 
@@ -112,26 +119,27 @@
   "Use available information to select and play the next
    relevent note for this player"
   [[ensemble player melody player-id rtn-map]]
-  (println "******  play-next-note  ******")
+  (println "******  play-next-note  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn play-rest
   [[ensemble player melody player-id rtn-map]]
-  (println "******  play-rest  ******")
+  (println "******  play-rest  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn select-instrument-for-player
   [[ensemble player melody player-id rtn-map :as args]]
-  (println "******  select-instrument-for-player  ******")
+  (println "******  select-instrument-for-player  ******" player-id)
   (let [cur-methods (:methods player)
         add-play-random-method? (nil? (:instrument player))
         new-instrument (select-instrument args)
         new-player (if add-play-random-method?
                      (assoc player
                             :instrument-info new-instrument
-                            :methods (conj cur-methods [play-random 10])
+                            :methods (conj cur-methods
+                                           (create-method-info play-random 10))
                             )
                      (assoc player
                             :instrument-info new-instrument
@@ -145,7 +153,7 @@
 
 (defn select-key
   [[ensemble player melody player-id rtn-map]]
-  (println "******  select-key  ******")
+  (println "******  select-key  ******" player-id)
   [ensemble
    (assoc player :key (select-random-key))
    melody
@@ -155,13 +163,13 @@
 
 (defn select-mm
   [[ensemble player melody player-id rtn-map]]
-  (println "******  select-mm  ******")
+  (println "******  select-mm  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn select-scale
   [[ensemble player melody player-id rtn-map]]
-  (println "******  select-scale  ******")
+  (println "******  select-scale  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
@@ -171,19 +179,19 @@
    Tell player how long you will watch for
   "
   [[ensemble player melody player-id rtn-map]]
-  (println "******  monitor-silence  ******")
+  (println "******  monitor-silence  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn monitor-soft
   [[ensemble player melody player-id rtn-map]]
-  (println "******  monitor-soft  ******")
+  (println "******  monitor-soft  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn sync-with-another-player
   [[ensemble player melody player-id rtn-map]]
-  (println "******  sync-with-another-player  ******")
+  (println "******  sync-with-another-player  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
@@ -204,7 +212,7 @@
       volume trend
   "
   [[ensemble player melody player-id rtn-map]]
-  (println "******  listen  ******")
+  (println "******  listen  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
@@ -213,30 +221,30 @@
 
 (defn build-melody
   [[ensemble player melody player-id rtn-map]]
-  (println "******  build-melody  ******")
+  (println "******  build-melody  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn build-countermelody
   [[ensemble player melody player-id rtn-map]]
-  (println "******  build-countermelody  ******")
+  (println "******  build-countermelody  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn sustained-accompaniment
   [[ensemble player melody player-id rtn-map]]
-  (println "******  sustained-accompaniment  ******")
+  (println "******  sustained-accompaniment  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn arpegiation
   [[ensemble player melody player-id rtn-map]]
-  (println "******  arpegiation  ******")
+  (println "******  arpegiation  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn loop-notes
   [[ensemble player melody player-id rtn-map]]
-  (println "******  loop  ******")
+  (println "******  loop  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )

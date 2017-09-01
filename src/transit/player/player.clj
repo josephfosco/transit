@@ -24,21 +24,24 @@
                                           select-scale
                                           ]]
    )
+  (:import transit.player.player_methods.MethodInfo)
   )
 
 (defrecord Player [id key scale mm instrument-info methods sampled-melodies])
 
 (defn get-initial-player-methods
   []
-  [
-   [listen 2]
-   [play-random-rest 2]
-   [monitor-silence 1]
-   [select-key 1]
-   [select-mm 1]
-   [select-instrument-for-player 3]
-   [select-scale 1]
-   ]
+  (let [time (System/currentTimeMillis)]
+      [
+       (MethodInfo. listen 2 time)
+       (MethodInfo. play-random-rest 2 time)
+       (MethodInfo. monitor-silence 1 time)
+       (MethodInfo. select-key 1 time)
+       (MethodInfo. select-mm 1 time)
+       (MethodInfo. select-instrument-for-player 3 time)
+       (MethodInfo. select-scale 1 time)
+       ]
+    )
   )
 
 (defn create-player
