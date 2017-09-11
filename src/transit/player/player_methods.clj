@@ -15,8 +15,10 @@
 
 (ns transit.player.player-methods
   (:require
+   [transit.config.constants :refer [MIN-MOTIF-MILLIS MAX-MOTIF-MILLIS]]
    [transit.instr.instrument :refer [select-instrument]]
    [transit.melody.melody-event :refer [create-melody-event
+                                        get-dur-millis-from-melody-event
                                         get-note-from-melody-event]]
    [transit.melody.pitch :refer [select-random-key
                                  select-random-pitch]]
@@ -50,6 +52,13 @@
          :methods (filter remove-meth? (:methods player)))
   )
 
+(defn add-methods
+  [mthds & methods-weights]
+  (apply conj
+         mthds
+         (for [[m w] (partition 2 methods-weights)] (create-method-info m w))
+         ))
+
 
 ;; --------------------------------------------------
 
@@ -64,22 +73,29 @@
   (println "******  play-random-note  ******" player-id)
   (let [next-id (inc (:id (last melody)))
         inst-inf (:instrument-info player)
+        next-melody-event (create-melody-event
+                           :id next-id
+                           :note (select-random-pitch (:range-lo inst-inf)
+                                                      (:range-hi inst-inf))
+                           :dur-info (select-random-rhythm)
+                           :volume (select-random-volume)
+                           :instrument-info (:instrument-info player)
+                           :player-id player-id
+                           :event-time nil
+                           )
         new-melody (assoc
                     melody
                     (count melody)
-                    (create-melody-event
-                     :id next-id
-                     :note (select-random-pitch (:range-lo inst-inf)
-                                                (:range-hi inst-inf))
-                     :dur-info (select-random-rhythm)
-                     :volume (select-random-volume)
-                     :instrument-info (:instrument-info player)
-                     :player-id player-id
-                     :event-time nil
-                     )
+                    next-melody-event
                     )
+        upd-player (if (< MIN-MOTIF-MILLIS
+                          (get-dur-millis-from-melody-event next-melody-event)
+                          MAX-MOTIF-MILLIS)
+                     player
+                     player
+                     )
         ]
-    [ensemble player new-melody player-id {:status NEW-MELODY}]
+    [ensemble upd-player new-melody player-id {:status NEW-MELODY}]
     )
   )
 
@@ -138,8 +154,7 @@
         new-player (if add-play-random-method?
                      (assoc player
                             :instrument-info new-instrument
-                            :methods (conj cur-methods
-                                           (create-method-info play-random 10))
+                            :methods (add-methods cur-methods play-random 10)
                             )
                      (assoc player
                             :instrument-info new-instrument

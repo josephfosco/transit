@@ -21,22 +21,54 @@
 
 (deftest test-remove-methods
   (testing "removes methods from player"
-    (is (=
-         {:id 1
-          :methods [[play-random 1]
-                    [select-key 1]
-                    [select-scale 1]
-                    ]}
-         (remove-methods {:id 1
-                          :methods [[play-random 1]
-                                    [select-instrument-for-player 1]
-                                    [select-key 1]
-                                    [select-scale 1]
-                                    ]}
-                         select-instrument-for-player
-                         select-mm
-                         )
-         )
-        )
+    (let [method1 (create-method-info select-instrument-for-player 10)
+          method2 (create-method-info select-key 1)
+          method3 (create-method-info select-scale 1)
+          method4 (create-method-info select-instrument-for-player 1)
+          method5 (create-method-info play-random 1)
+          ]
+        (is (=
+             {:id 1
+              :methods [method2 method3 method5]
+              }
+             (remove-methods {:id 1
+                              :methods [method1
+                                        method2
+                                        method3
+                                        method4
+                                        method5
+                                        ]}
+                             select-instrument-for-player
+                             select-mm
+                             )
+             )
+            ))
     )
+  )
+
+(deftest test-add-methods
+  (testing "adds methods to player"
+    (let [method1 (create-method-info play-random 1)
+          method2 (create-method-info select-key 1)
+          method3 (create-method-info select-scale 1)
+          orig-methods [method1 method2 method3]
+          updated-methods (add-methods orig-methods
+                                       select-instrument-for-player 2
+                                       select-mm 2
+                                       select-scale 3
+                                       )
+          ]
+      (is (= 6 (count updated-methods)))
+      (is (= orig-methods (take 3 updated-methods)))
+      (is (= (for [mthd updated-methods] (:method mthd))
+             (list play-random
+              select-key
+              select-scale
+              select-instrument-for-player
+              select-mm
+              select-scale))
+          )
+      (is (= (for [mthd updated-methods] (:weight mthd)) '(1 1 1 2 2 3))
+          )
+      ))
   )

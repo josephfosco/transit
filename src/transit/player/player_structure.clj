@@ -13,12 +13,17 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+(ns transit.player.player-structure)
 
-{:log-level nil
+(defrecord PlayerStructure [motif])
 
- :min-volume 0.2
+(defn create-player-structure
+  [& {:keys [motif]} :or {motif nil}]
+  (MelodyEvent. motif
+                )
+  )
 
- :num-players 10
-
- :volume-adjust 1
- }
+(defn update-player-strcture
+  [player-structure & kvs]
+  (assoc player-structure kvs)
+  )

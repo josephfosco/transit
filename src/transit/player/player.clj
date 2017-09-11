@@ -27,7 +27,7 @@
   (:import transit.player.player_methods.MethodInfo)
   )
 
-(defrecord Player [id key scale mm instrument-info methods sampled-melodies])
+(defrecord Player [id key scale mm instrument-info methods sampled-melodies structures])
 
 (defn get-initial-player-methods
   []
@@ -53,6 +53,7 @@
            nil  ;; instrument
            (get-initial-player-methods)
            nil  ;; sampled-melodies
+           []   ;; structures
            )
   )
 
@@ -78,7 +79,10 @@
         (do
           (println " " player-key)
           (doseq [method-info (get player :methods)]
-            (println "   " (type (method-info 0)) " weight: " (method-info 1))
+            (println "   " (type (:method method-info))
+                     " weight: " (:weight method-info)
+                     " time: " (time method-info)
+                     )
             ))
         (and (= player-key :instrument-info) (= prnt-full-inst-info false))
         (do

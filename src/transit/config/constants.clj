@@ -13,12 +13,11 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+(ns transit.config.constants
+  (:require
+   [overtone.live :refer [MIDI-RANGE]]
+   )
+  )
 
-{:log-level nil
-
- :min-volume 0.2
-
- :num-players 10
-
- :volume-adjust 1
- }
+(def MIN-MOTIF-MILLIS 200)
+(def MAX-MOTIF-MILLIS 1000)
