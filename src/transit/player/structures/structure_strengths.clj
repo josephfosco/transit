@@ -13,17 +13,14 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.player.player-structure)
+(ns transit.player.structures.structure-strengths)
 
-(defrecord PlayerStructure [motif])
+(defrecord StructureStrengths [internal-strength
+                               external-strength])
 
-(defn create-player-structure
-  [& {:keys [motif]} :or {motif nil}]
-  (MelodyEvent. motif
-                )
-  )
-
-(defn update-player-strcture
-  [player-structure & kvs]
-  (assoc player-structure kvs)
+(defn create-structure-strengrhs
+  [& {:keys [internal-strength external-strength]} :or
+   {internal-strength 0 external-strength 0}]
+  (StructureStrengths. internal-strength external-strength
+                  )
   )

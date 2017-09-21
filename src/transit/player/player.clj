@@ -23,6 +23,8 @@
                                           select-instrument-for-player
                                           select-scale
                                           ]]
+   [transit.melody.melody-event :refer [create-melody-event]]
+   [transit.melody.rhythm :refer [select-random-rhythm]]
    )
   (:import transit.player.player_methods.MethodInfo)
   )
@@ -64,6 +66,69 @@
 (defn get-player-instrument-info
   [player]
   (:instrument-info player))
+
+(defn find-high-strength
+  " A reducing function to find the index of the struct with the highest strength
+    Calls strength-fn from struct and if it is > then the current highest
+      strength (returns a result containing information for the current struct
+    rslt is an array of 3 elements
+      [ index of structure with the highest strength so far
+        value of highest strength so far
+        index for the next structure
+      ]
+  "
+  [rslt struct]
+  (let [new-strength ((:strength-fn struct) struct)]
+    (if (> new-strength (second rslt))
+      [(get rslt 2) new-strength (inc (get rslt 2))]
+      [(first rslt) (second rslt) (inc (get rslt 2))]
+      )
+    )
+  )
+
+(defn get-next-melody-event
+  [player melody player-id]
+  (let [plyr-structs (:structures player)
+        max-strength-index (first (reduce find-high-strength
+                                          [0 0 0]
+                                          plyr-structs
+                                          ))
+        melody-struct (get plyr-structs max-strength-index)
+        ]
+
+        ;; (first
+        ;;  (apply max-key
+        ;;         second
+        ;;         (map-indexed vector
+        ;;                      (map eval
+        ;;                           (map list
+        ;;                                (map :get-strength-mthd plyr-structs)
+        ;;                                plyr-structs
+        ;;                                )
+        ;;                           )
+        ;;                      )))
+
+    ;; (keep-indexed #(vec (list %1 ((:get-strength-mthd %2) %2))) (:structures player)
+    ;; (->> (for [struct (:structures player)] ((:get-strength-mthd struct) struct))
+    ;;      (map-indexed vector)
+    ;;      (apply max-key second)
+    ;;      (first)
+    ;;      )
+    ;; )
+
+    (if melody-struct
+      ((:melody-fn melody-struct) player  melody-struct (count melody))
+      (create-melody-event :id (count melody)
+                           :note nil
+                           :dur-info (select-random-rhythm)
+                           :volume nil
+                           :instrument-info nil
+                           :player-id player-id
+                           :event-time nil
+                           )
+      )
+    )
+  )
 
 (defn print-player
   "Pretty Print a player map

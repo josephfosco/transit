@@ -17,6 +17,7 @@
   (:require
    [transit.config.constants :refer [MIN-MOTIF-MILLIS MAX-MOTIF-MILLIS]]
    [transit.instr.instrument :refer [select-instrument]]
+   [transit.player.structures.random-event :refer [create-random-event]]
    [transit.melody.melody-event :refer [create-melody-event
                                         get-dur-millis-from-melody-event
                                         get-note-from-melody-event]]
@@ -30,6 +31,7 @@
 (defrecord MethodInfo [method weight time])
 
 ;; method return values
+(def OK 1)  ;; Method completed normally
 (def CONTINUE 1)  ;; Processing complete - do not call additional methods
 (def NEW-MELODY 2)  ;; Processing complete - last melody event is new
 (def NEXT-METHOD 3)  ;; Select and call another method
@@ -125,10 +127,20 @@
 (defn play-random
   [[ensemble player melody player-id rtn-map]]
   (println "******  play-random  ******" player-id)
-  (if (= (rand-int 2) 0)
-    (play-random-rest [ensemble player melody player-id rtn-map])
-    (play-random-note [ensemble player melody player-id rtn-map])
-    )
+  [ensemble
+   (assoc player :structures
+          (assoc (:structures player)
+                 (count (:structures player))
+                 (create-random-event)
+                 ))
+   melody
+   player-id
+   {:status OK}
+   ]
+  ;; (if (= (rand-int 2) 0)
+  ;;   (play-random-rest [ensemble player melody player-id rtn-map])
+  ;;   (play-random-note [ensemble player melody player-id rtn-map])
+  ;;   )
   )
 
 (defn play-next-note

@@ -13,20 +13,13 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.melody.dur-info)
+(ns transit.player.structures.theme)
 
-(defrecord DurInfo [dur-millis dur-beats])
+(defrecord Theme [])
 
-(defn create-dur-info
-  [& {:keys [dur-millis dur-beats] :or
-      {dur-millis nil dur-beats nil}}]
-  (DurInfo. dur-millis dur-beats)
+(defn create-theme
+  [& {:keys [internal-strength]} :or
+   {internal-strength nil}]
+  (Theme. internal-strength
+          )
   )
-
-(defn get-dur-millis-from-dur-info
-  [dur-info]
-  (:dur-millis dur-info))
-
-(defn get-dur-beats-from-dur-info
-  [dur-info]
-  (:dur-beats dur-info))

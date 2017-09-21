@@ -21,6 +21,7 @@
 (def min-vol (get-setting :min-volume))
 
 (defn select-random-volume
+  " Returns a random value between min-vol and 1"
   ([]
    (+ (rand (- 1 min-vol)) min-vol))
   ([lo hi]

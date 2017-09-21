@@ -13,20 +13,19 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.melody.dur-info)
+(ns transit.player.structures.base-structure)
 
-(defrecord DurInfo [dur-millis dur-beats])
+(defrecord BaseStructure [internal-strength
+                               external-strength])
 
-(defn create-dur-info
-  [& {:keys [dur-millis dur-beats] :or
-      {dur-millis nil dur-beats nil}}]
-  (DurInfo. dur-millis dur-beats)
+(defn create-base-structure
+  [& {:keys [internal-strength external-strength] :or
+      {internal-strength 0 external-strength 0}}]
+  (BaseStructure. internal-strength external-strength
+                  )
   )
 
-(defn get-dur-millis-from-dur-info
-  [dur-info]
-  (:dur-millis dur-info))
-
-(defn get-dur-beats-from-dur-info
-  [dur-info]
-  (:dur-beats dur-info))
+(defn get-base-strength
+  [base-struct]
+  (min 100 (+ (:internal-strength base-struct) (:external-strength base-struct)))
+  )

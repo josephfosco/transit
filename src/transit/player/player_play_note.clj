@@ -35,6 +35,7 @@
                                         get-sc-instrument-id-from-melody-event
                                         get-volume-from-melody-event
                                         set-play-info]]
+   [transit.player.player :refer [get-next-melody-event]]
    [transit.player.player-methods :refer [NEW-MELODY NEXT-METHOD]]
    [transit.util.random :refer [weighted-choice]]
    [transit.util.util :refer [remove-element-from-vector]]
@@ -98,9 +99,9 @@
   )
 
 (defn stop-running-methods?
-  [event_time [_ player melody player-id rtn-map]]
-  (or (= 0 (count (:methods player )))
-      (not= (:status rtn-map) NEXT-METHOD)
+  [event-time [ens player melody player-id rtn-map]]
+  (or (= 0 (count (:methods player)))
+      (>= (System/currentTimeMillis) (- event-time 10))
       )
   )
 
@@ -127,9 +128,9 @@
 (declare play-next-note)
 (defn sched-next-note
   [melody-event]
-  (let [next-time (+ (get-event-time-from-melody-event melody-event)
-                     (get-dur-millis-from-melody-event melody-event)
-                     )]
+  (let [next-time (- (+ (get-event-time-from-melody-event melody-event)
+                        (get-dur-millis-from-melody-event melody-event)
+                        ) 25)]
     (apply-at next-time
               play-next-note
               [(get-player-id-from-melody-event melody-event) next-time]
@@ -175,18 +176,19 @@
         player (get-player ensemble player-id)
         melody (get-melody ensemble player-id)
         method-context [ensemble player melody player-id {:status NEXT-METHOD}]
-        [_ new-player new-melody player-id rtn-map]
+        [_ new-player melody player-id rtn-map]
         (first (filter (partial stop-running-methods? event-time)
                        (iterate run-player-method method-context)))
-        upd-melody (if (= (:status rtn-map) NEW-MELODY)
-                     (assoc new-melody
-                            (dec (count new-melody))
-                            (play-melody-event (last melody) (last new-melody) event-time))
-                     new-melody)
+        next-melody-event (play-melody-event (last melody)
+                                             (get-next-melody-event
+                                              new-player
+                                              melody
+                                              player-id)
+                                             event-time)
+        upd-melody (assoc melody (count melody) next-melody-event)
         ]
-    (check-prior-event-note-off (last melody) upd-melody)
-    (when  (= (:status rtn-map) NEW-MELODY)
-      (sched-next-note (last upd-melody)))
+    (check-prior-event-note-off (last melody) next-melody-event)
+    (sched-next-note next-melody-event)
     (update-player-and-melody new-player upd-melody player-id))
   (println (- (System/currentTimeMillis) event-time))
  )
