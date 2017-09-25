@@ -17,6 +17,9 @@
   (:require
    [transit.melody.dur-info :refer [create-dur-info]]
    [transit.melody.melody-event :refer [create-melody-event]]
+   [transit.melody.pitch :refer [select-random-pitch]]
+   [transit.melody.rhythm :refer [select-random-rhythm]]
+   [transit.melody.volume :refer [select-random-volume]]
    [transit.player.structures.base-structure :refer [create-base-structure
                                                      get-base-strength
                                                      ]]
@@ -36,17 +39,39 @@
   (get-base-strength (:base rnd-evnt))
   )
 
-(defn get-melody-event
-  [player rnd-evnt next-id]
+(defn get-random-note-event
+  [player next-id]
   (create-melody-event
    :id next-id
-   :note 60
-   :dur-info (create-dur-info :dur-millis 500)
-   :volume 0.7
+   :note (select-random-pitch (:range-lo (:instrument-info player))
+                              (:range-hi (:instrument-info player)))
+   :dur-info (select-random-rhythm)
+   :volume (select-random-volume)
    :instrument-info (:instrument-info player)
    :player-id (:id player)
    :event-time nil
    )
+  )
+
+(defn get-random-rest-event
+  [player next-id]
+  (create-melody-event
+   :id next-id
+   :note nil
+   :dur-info (select-random-rhythm)
+   :volume nil
+   :instrument-info nil
+   :player-id (:id player)
+   :event-time nil
+   )
+  )
+
+(defn get-melody-event
+  [player rnd-evnt next-id]
+  (if (= (rand-int 2) 1)
+    (get-random-note-event player next-id)
+    (get-random-rest-event player next-id)
+    )
   )
 
 (defn create-random-event

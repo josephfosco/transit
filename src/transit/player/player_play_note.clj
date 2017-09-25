@@ -42,6 +42,8 @@
    )
   )
 
+(def METHOD-PROCESS-MILLIS 12)
+
 (defn get-player-method
   [player ndx]
   (:method ((:methods player) ndx))
@@ -130,7 +132,7 @@
   [melody-event]
   (let [next-time (- (+ (get-event-time-from-melody-event melody-event)
                         (get-dur-millis-from-melody-event melody-event)
-                        ) 25)]
+                        ) METHOD-PROCESS-MILLIS)]
     (apply-at next-time
               play-next-note
               [(get-player-id-from-melody-event melody-event) next-time]
@@ -171,8 +173,9 @@
   )
 
 (defn play-next-note
-  [player-id event-time]
-  (let [ensemble (get-ensemble)
+  [player-id sched-time]
+  (let [event-time (+ sched-time METHOD-PROCESS-MILLIS)
+        ensemble (get-ensemble)
         player (get-player ensemble player-id)
         melody (get-melody ensemble player-id)
         method-context [ensemble player melody player-id {:status NEXT-METHOD}]
@@ -189,6 +192,7 @@
         ]
     (check-prior-event-note-off (last melody) next-melody-event)
     (sched-next-note next-melody-event)
-    (update-player-and-melody new-player upd-melody player-id))
-  (println (- (System/currentTimeMillis) event-time))
+    (update-player-and-melody new-player upd-melody player-id)
+    (println (- (System/currentTimeMillis) event-time))
+    )
  )

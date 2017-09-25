@@ -54,7 +54,7 @@
 
 (defn- play-first-note
   [player-id]
-  (play-next-note player-id (+ (now) 20) )
+  (play-next-note player-id (now))
   )
 
 (defn- start-playing

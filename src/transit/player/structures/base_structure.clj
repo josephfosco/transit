@@ -16,12 +16,17 @@
 (ns transit.player.structures.base-structure)
 
 (defrecord BaseStructure [internal-strength
-                               external-strength])
+                          external-strength
+                          ctrated-at
+                          updated-at])
 
 (defn create-base-structure
   [& {:keys [internal-strength external-strength] :or
       {internal-strength 0 external-strength 0}}]
-  (BaseStructure. internal-strength external-strength
+  (BaseStructure. internal-strength
+                  external-strength
+                  created-at (System/currentTimeMillis)
+                  updated-at (System/currentTimeMillis)
                   )
   )
 

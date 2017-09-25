@@ -131,7 +131,7 @@
    (assoc player :structures
           (assoc (:structures player)
                  (count (:structures player))
-                 (create-random-event)
+                 (create-random-event :internal-strength 1)
                  ))
    melody
    player-id
