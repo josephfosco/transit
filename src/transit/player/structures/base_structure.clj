@@ -17,7 +17,7 @@
 
 (defrecord BaseStructure [internal-strength
                           external-strength
-                          ctrated-at
+                          created-at
                           updated-at])
 
 (defn create-base-structure
