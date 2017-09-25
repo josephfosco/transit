@@ -21,7 +21,7 @@
                           updated-at])
 
 (defn create-base-structure
-  [& {:keys [internal-strength external-strength] :or
+  [& {:keys [internal-strength external-strength created-at updated-at] :or
       {internal-strength 0 external-strength 0}}]
   (BaseStructure. internal-strength
                   external-strength
