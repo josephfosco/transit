@@ -70,58 +70,19 @@
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
-(defn play-random-note
-  [[ensemble player melody player-id rtn-map]]
-  (println "******  play-random-note  ******" player-id)
-  (let [next-id (inc (:id (last melody)))
-        inst-inf (:instrument-info player)
-        next-melody-event (create-melody-event
-                           :id next-id
-                           :note (select-random-pitch (:range-lo inst-inf)
-                                                      (:range-hi inst-inf))
-                           :dur-info (select-random-rhythm)
-                           :volume (select-random-volume)
-                           :instrument-info (:instrument-info player)
-                           :player-id player-id
-                           :event-time nil
-                           )
-        new-melody (assoc
-                    melody
-                    (count melody)
-                    next-melody-event
-                    )
-        upd-player (if (< MIN-MOTIF-MILLIS
-                          (get-dur-millis-from-melody-event next-melody-event)
-                          MAX-MOTIF-MILLIS)
-                     player
-                     player
-                     )
-        ]
-    [ensemble upd-player new-melody player-id {:status NEW-MELODY}]
-    )
-  )
-
 (defn play-random-rest
   [[ensemble player melody player-id rtn-map]]
   (println "******  play-random-rest  ******" player-id)
-  (let [next-id (inc (:id (last melody)))
-        inst-inf (:instrument-info player)
-        new-melody (assoc
-                    melody
-                    (count melody)
-                    (create-melody-event
-                     :id next-id
-                     :note nil
-                     :dur-info (select-random-rhythm)
-                     :volume nil
-                     :instrument-info nil
-                     :player-id player-id
-                     :event-time nil
-                     )
-                    )
-        ]
-    [ensemble player new-melody player-id {:status NEW-MELODY}]
-    )
+  [ensemble
+   (assoc player :structures
+          (assoc (:structures player)
+                 (count (:structures player))
+                 (create-random-event :internal-strength 1 :rest? true)
+                 ))
+   melody
+   player-id
+   {:status OK}
+   ]
   )
 
 (defn play-random
@@ -137,10 +98,6 @@
    player-id
    {:status OK}
    ]
-  ;; (if (= (rand-int 2) 0)
-  ;;   (play-random-rest [ensemble player melody player-id rtn-map])
-  ;;   (play-random-note [ensemble player melody player-id rtn-map])
-  ;;   )
   )
 
 (defn play-next-note

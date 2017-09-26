@@ -29,9 +29,7 @@
 (defrecord RandomEvent [base
                         strength-fn
                         melody-fn
-                        pitch
-                        duration
-                        volume
+                        rest?
                         ])
 
 (defn get-strength
@@ -68,27 +66,22 @@
 
 (defn get-melody-event
   [player rnd-evnt next-id]
-  (if (= (rand-int 2) 1)
-    (get-random-note-event player next-id)
+  (if (or (:rest? rnd-evnt) (= (rand-int 2) 0))
     (get-random-rest-event player next-id)
+    (get-random-note-event player next-id)
     )
   )
 
 (defn create-random-event
-  [& {:keys [melody-event-ids
-             type
-             complete?
-             internal-strength
-             external-strength] :or
-      {melody-event-ids nil
-       complete? false
-       internal-strength 0
-       external-strength 0}}]
+  [& {:keys [internal-strength
+             external-strength
+             rest?] :or
+      {internal-strength 0
+       external-strength 0
+       rest? nil}}]
   (RandomEvent. (create-base-structure internal-strength external-strength)
                  get-strength
                  get-melody-event
-                 nil
-                 nil
-                 nil
+                 rest?
                  )
   )
