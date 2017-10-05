@@ -23,9 +23,9 @@
   )
 
 (deftest test-stop-running-methods?
-  (testing "returns false if there are mathods and status no NEXT-METHOD"
+  (testing "returns false if there are mathods and event_time is > current time"
     (is (=
-         true
+         false
          (stop-running-methods? (+ (System/currentTimeMillis) 1000)
                                 [{}
                                  {:methods [1 1]}
@@ -47,10 +47,22 @@
          )
         )
     )
-  (testing "returns true if status is NEXT-METHOD"
+  (testing "returns true if event_time = current time"
     (is (=
          true
-         (stop-running-methods? (+ (System/currentTimeMillis) 1000)
+         (stop-running-methods? (System/currentTimeMillis)
+                                [{}
+                                 {:methods [1 1]}
+                                 0
+                                 {:status NEXT-METHOD}
+                                 ])
+         )
+        )
+    )
+  (testing "returns true if event_time < current time"
+    (is (=
+         true
+         (stop-running-methods? (- (System/currentTimeMillis) 10)
                                 [{}
                                  {:methods [1 1]}
                                  0

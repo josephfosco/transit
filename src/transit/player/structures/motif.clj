@@ -15,6 +15,8 @@
 
 (ns transit.player.structures.motif
   (:require
+   [transit.melody.melody-event :refer [create-melody-event]]
+   [transit.melody.rhythm :refer [select-random-rhythm]]
    [transit.player.structures.base-structure :refer [create-base-structure
                                                      get-base-strength
                                                      ]]
@@ -29,33 +31,31 @@
                   complete? ;; is this a complete motif
                   ])
 
-(defn create-motif
-  [& {:keys [melody-event-ids type complete?]} :or
-   {melody-event-ids nil complete? false}]
-  (Motif. (create-base-structure)
-          get-strength
-          get-melody-event
-          melody-event-ids
-          type
-          complete?
-          )
+(defn get-motif-strength
+  [rnd-evnt]
+  (get-base-strength (:base rnd-evnt))
   )
 
-(defn get-strength
-  [motif]
-  (get-base-strength (:base motif))
-  )
-
-(defn get-melody-event
+(defn get-motif-melody-event
   [player motif next-id]
   (create-melody-event
    :id next-id
    :note 60
-   :dur-info (DurInfo. 500 nil)
+   :dur-info (select-random-rhythm)
    :volume 0.7
    :instrument-info (:instrument-info player)
-   :player-id player-id
+   :player-id (:id player)
    :event-time nil
    )
-
+  )
+(defn create-motif
+  [& {:keys [melody-event-ids type complete?] :or
+      {melody-event-ids nil complete? false}}]
+  (Motif. (create-base-structure)
+          get-motif-strength
+          get-motif-melody-event
+          melody-event-ids
+          type
+          complete?
+          )
   )

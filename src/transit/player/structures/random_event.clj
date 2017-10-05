@@ -32,7 +32,7 @@
                         rest?
                         ])
 
-(defn get-strength
+(defn get-random-event-strength
   [rnd-evnt]
   (get-base-strength (:base rnd-evnt))
   )
@@ -64,7 +64,7 @@
    )
   )
 
-(defn get-melody-event
+(defn get-random-melody-event
   [player rnd-evnt next-id]
   (if (or (:rest? rnd-evnt) (= (rand-int 2) 0))
     (get-random-rest-event player next-id)
@@ -80,8 +80,8 @@
        external-strength 0
        rest? nil}}]
   (RandomEvent. (create-base-structure internal-strength external-strength)
-                 get-strength
-                 get-melody-event
+                 get-random-event-strength
+                 get-random-melody-event
                  rest?
                  )
   )

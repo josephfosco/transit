@@ -15,6 +15,8 @@
 
 (ns transit.player.structures.base-structure)
 
+(def MAX_STRUCTURE_STRENGTH 100.0)
+
 (defrecord BaseStructure [internal-strength
                           external-strength
                           created-at

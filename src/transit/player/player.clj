@@ -79,9 +79,9 @@
   "
   [rslt struct]
   (let [new-strength ((:strength-fn struct) struct)]
-    (if (> new-strength (second rslt))
-      [(get rslt 2) new-strength (inc (get rslt 2))]
-      [(first rslt) (second rslt) (inc (get rslt 2))]
+    (if (< (second rslt) new-strength)
+      [(rslt 2) new-strength (inc (rslt 2))]
+      [(first rslt) (second rslt) (inc (rslt 2))]
       )
     )
   )
@@ -96,26 +96,6 @@
         melody-struct (get plyr-structs max-strength-index)
         ]
 
-        ;; (first
-        ;;  (apply max-key
-        ;;         second
-        ;;         (map-indexed vector
-        ;;                      (map eval
-        ;;                           (map list
-        ;;                                (map :get-strength-mthd plyr-structs)
-        ;;                                plyr-structs
-        ;;                                )
-        ;;                           )
-        ;;                      )))
-
-    ;; (keep-indexed #(vec (list %1 ((:get-strength-mthd %2) %2))) (:structures player)
-    ;; (->> (for [struct (:structures player)] ((:get-strength-mthd struct) struct))
-    ;;      (map-indexed vector)
-    ;;      (apply max-key second)
-    ;;      (first)
-    ;;      )
-    ;; )
-
     (if melody-struct
       ((:melody-fn melody-struct) player  melody-struct (count melody))
       (create-melody-event :id (count melody)
@@ -128,6 +108,15 @@
                            )
       )
     )
+  )
+
+(defn remove-structure-type
+  [player struct-type & {:keys [:time] :or {time nil}}]
+  (assoc player
+         :structures
+         (vec (filter #(not= struct-type (type %)) (:structures player)))
+         )
+
   )
 
 (defn print-player

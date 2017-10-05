@@ -28,7 +28,7 @@
    )
   )
 
-(defrecord MethodInfo [method weight time])
+(defrecord MethodInfo [method weight created-at])
 
 ;; method return values
 (def OK 1)  ;; Method completed normally
@@ -98,14 +98,6 @@
    player-id
    {:status OK}
    ]
-  )
-
-(defn play-next-note
-  "Use available information to select and play the next
-   relevent note for this player"
-  [[ensemble player melody player-id rtn-map]]
-  (println "******  play-next-note  ******" player-id)
-  [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn play-rest
@@ -202,6 +194,12 @@
 
 
 ;; TOP DOWN METHODS
+
+(defn build-motif
+  [[ensemble player melody player-id rtn-map]]
+  (println "******  build-motif  ******" player-id)
+  [ensemble player melody player-id {:status CONTINUE}]
+  )
 
 (defn build-melody
   [[ensemble player melody player-id rtn-map]]
