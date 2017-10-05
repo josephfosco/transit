@@ -26,6 +26,7 @@
    [transit.melody.rhythm :refer [select-random-rhythm]]
    [transit.melody.volume :refer [select-random-volume]]
    )
+  (:import [transit.player.structures.random_event RandomEvent])
   )
 
 (defrecord MethodInfo [method weight created-at])
@@ -60,6 +61,15 @@
          mthds
          (for [[m w] (partition 2 methods-weights)] (create-method-info m w))
          ))
+
+(defn remove-structure-type
+  [player struct-type & {:keys [:time] :or {time nil}}]
+  (assoc player
+         :structures
+         (vec (filter #(not= struct-type (type %)) (:structures player)))
+         )
+
+  )
 
 
 ;; --------------------------------------------------
@@ -113,7 +123,7 @@
         add-play-random-method? (nil? (:instrument player))
         new-instrument (select-instrument args)
         new-player (if add-play-random-method?
-                     (assoc player
+                     (assoc (remove-structure-type player RandomEvent)
                             :instrument-info new-instrument
                             :methods (add-methods cur-methods play-random 10)
                             )

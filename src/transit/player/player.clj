@@ -110,15 +110,6 @@
     )
   )
 
-(defn remove-structure-type
-  [player struct-type & {:keys [:time] :or {time nil}}]
-  (assoc player
-         :structures
-         (vec (filter #(not= struct-type (type %)) (:structures player)))
-         )
-
-  )
-
 (defn print-player
   "Pretty Print a player map
 

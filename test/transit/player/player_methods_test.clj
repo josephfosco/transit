@@ -14,6 +14,14 @@
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns transit.player.player-methods-test
+  (:require
+   [transit.player.player :use [create-player]]
+   [transit.player.structures.motif :use [create-motif]]
+   [transit.player.structures.random-event :use [create-random-event]]
+   )
+  (:import
+   [transit.player.structures.motif Motif]
+   )
   (:use clojure.test
         transit.player.player-methods
         )
@@ -71,4 +79,20 @@
       (is (= (for [mthd updated-methods] (:weight mthd)) '(1 1 1 2 2 3))
           )
       ))
+  )
+
+(deftest test-remove-structure-type
+  (testing "removes all structures af a type from player"
+    (let [struct1 (create-random-event)
+          struct2 (create-motif)
+          struct3 (create-random-event)
+          struct4 (create-motif)
+          player (assoc (create-player :id 1)
+                        :structures [struct1 struct2 struct3 struct4]
+                        )]
+        (is (= (assoc player :structures [struct1 struct3])
+             (remove-structure-type player Motif)
+             )
+            ))
+    )
   )
