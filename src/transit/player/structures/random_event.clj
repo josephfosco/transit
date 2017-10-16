@@ -20,22 +20,11 @@
    [transit.melody.pitch :refer [select-random-pitch]]
    [transit.melody.rhythm :refer [select-random-rhythm]]
    [transit.melody.volume :refer [select-random-volume]]
-   [transit.player.structures.base-structure :refer [create-base-structure
-                                                     get-base-strength
-                                                     ]]
+   [transit.player.structures.base-structure :refer [create-base-structure]]
    )
 )
 
-(defrecord RandomEvent [base
-                        strength-fn
-                        melody-fn
-                        rest?
-                        ])
-
-(defn get-random-event-strength
-  [rnd-evnt]
-  (get-base-strength (:base rnd-evnt))
-  )
+(defrecord RandomEvent [base rest?])
 
 (defn get-random-note-event
   [player next-id]
@@ -79,9 +68,9 @@
       {internal-strength 0
        external-strength 0
        rest? nil}}]
-  (RandomEvent. (create-base-structure internal-strength external-strength)
-                 get-random-event-strength
-                 get-random-melody-event
+  (RandomEvent. (create-base-structure :internal-strength internal-strength
+                                       :external-strength external-strength
+                                       :melody-fn get-random-melody-event)
                  rest?
                  )
   )

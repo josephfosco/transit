@@ -19,20 +19,40 @@
 
 (defrecord BaseStructure [internal-strength
                           external-strength
+                          strength-fn
+                          melody-fn
                           created-at
                           updated-at])
 
+(defn get-base-strength
+  [struct]
+  (let [base-struct (:base struct)]
+    (min 100 (+ (:internal-strength base-struct)
+                (:external-strength base-struct)))
+    )
+  )
+
+(defn get-strength-fn
+  [struct]
+  (:strength-fn (:base struct))
+  )
+
+(defn get-melody-fn
+  [struct]
+  (:melody-fn (:base struct))
+  )
+
 (defn create-base-structure
-  [& {:keys [internal-strength external-strength] :or
-      {internal-strength 0 external-strength 0}}]
+  [& {:keys [internal-strength external-strength strength-fn melody-fn] :or
+      {internal-strength 0
+       external-strength 0
+       strength-fn get-base-strength
+       }}]
   (BaseStructure. internal-strength
                   external-strength
+                  strength-fn
+                  melody-fn
                   (System/currentTimeMillis)
                   (System/currentTimeMillis)
                   )
-  )
-
-(defn get-base-strength
-  [base-struct]
-  (min 100 (+ (:internal-strength base-struct) (:external-strength base-struct)))
   )

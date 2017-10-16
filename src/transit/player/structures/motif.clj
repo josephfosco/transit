@@ -17,24 +17,15 @@
   (:require
    [transit.melody.melody-event :refer [create-melody-event]]
    [transit.melody.rhythm :refer [select-random-rhythm]]
-   [transit.player.structures.base-structure :refer [create-base-structure
-                                                     get-base-strength
-                                                     ]]
+   [transit.player.structures.base-structure :refer [create-base-structure]]
    )
   )
 
 (defrecord Motif [base
-                  strength-fn
-                  melody-fn
                   melody-event-ids
                   type  ;; FREE or METERED (METERED has mm and rhythmic values)
                   complete? ;; is this a complete motif
                   ])
-
-(defn get-motif-strength
-  [rnd-evnt]
-  (get-base-strength (:base rnd-evnt))
-  )
 
 (defn get-motif-melody-event
   [player motif next-id]
@@ -52,8 +43,6 @@
   [& {:keys [melody-event-ids type complete?] :or
       {melody-event-ids nil complete? false}}]
   (Motif. (create-base-structure)
-          get-motif-strength
-          get-motif-melody-event
           melody-event-ids
           type
           complete?

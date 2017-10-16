@@ -23,6 +23,8 @@
                                           select-instrument-for-player
                                           select-scale
                                           ]]
+   [transit.player.structures.base-structure :refer [get-melody-fn
+                                                     get-strength-fn]]
    [transit.melody.melody-event :refer [create-melody-event]]
    [transit.melody.rhythm :refer [select-random-rhythm]]
    )
@@ -78,7 +80,7 @@
       ]
   "
   [rslt struct]
-  (let [new-strength ((:strength-fn struct) struct)]
+  (let [new-strength ((get-strength-fn struct) struct)]
     (if (< (second rslt) new-strength)
       [(rslt 2) new-strength (inc (rslt 2))]
       [(first rslt) (second rslt) (inc (rslt 2))]
@@ -97,7 +99,7 @@
         ]
 
     (if melody-struct
-      ((:melody-fn melody-struct) player  melody-struct (count melody))
+      ((get-melody-fn melody-struct) player  melody-struct (count melody))
       (create-melody-event :id (count melody)
                            :note nil
                            :dur-info (select-random-rhythm)
