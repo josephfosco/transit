@@ -15,9 +15,10 @@
 
 (ns transit.player.player-methods
   (:require
-   [transit.config.constants :refer [MIN-MOTIF-MILLIS MAX-MOTIF-MILLIS]]
+   [transit.config.constants :refer [FREE METERED]]
    [transit.instr.instrument :refer [select-instrument]]
    [transit.player.structures.random-event :refer [create-random-event]]
+   [transit.player.structures.motif :refer [create-motif]]
    [transit.melody.melody-event :refer [create-melody-event
                                         get-dur-millis-from-melody-event
                                         get-note-from-melody-event]]
@@ -26,7 +27,10 @@
    [transit.melody.rhythm :refer [select-random-rhythm]]
    [transit.melody.volume :refer [select-random-volume]]
    )
-  (:import [transit.player.structures.random_event RandomEvent])
+  (:import
+   [transit.player.structures.random_event RandomEvent]
+   [transit.player.structures.motif Motif]
+   )
   )
 
 (defrecord MethodInfo [method weight created-at])
@@ -64,10 +68,17 @@
 
 (defn remove-structure-type
   [player struct-type & {:keys [:time] :or {time nil}}]
-  (assoc player
-         :structures
-         (vec (filter #(not= struct-type (type %)) (:structures player)))
-         )
+  (if (list? struct-type)
+    (assoc player
+           :structures
+           (vec (for [struct (:Structures player)
+                      :when (not-any? #{struct} struct-type)]
+                  struct
+                  )))
+    (assoc player
+           :structures
+           (vec (filter #(not= struct-type (type %)) (:structures player)))
+           ))
 
   )
 
@@ -120,12 +131,15 @@
   [[ensemble player melody player-id rtn-map :as args]]
   (println "******  select-instrument-for-player  ******" player-id)
   (let [cur-methods (:methods player)
-        add-play-random-method? (nil? (:instrument player))
+        first-instrument? (nil? (:instrument player))
         new-instrument (select-instrument args)
-        new-player (if add-play-random-method?
-                     (assoc (remove-structure-type player RandomEvent)
+        new-player (if first-instrument?
+                     (assoc (remove-structure-type player '(Motif RandomEvent))
                             :instrument-info new-instrument
-                            :methods (add-methods cur-methods play-random 10)
+                            :methods (add-methods cur-methods
+                                                  play-random 10
+                                                  build-motif 10
+                                                  )
                             )
                      (assoc player
                             :instrument-info new-instrument
@@ -208,7 +222,17 @@
 (defn build-motif
   [[ensemble player melody player-id rtn-map]]
   (println "******  build-motif  ******" player-id)
-  [ensemble player melody player-id {:status CONTINUE}]
+  [ensemble
+   (assoc player :structures
+          (assoc (:structures player)
+                 (count (:structures player))
+                 (create-motif :internal-strength 1
+                               :type FREE)
+                 ))
+   melody
+   player-id
+   {:status OK}
+   ]
   )
 
 (defn build-melody

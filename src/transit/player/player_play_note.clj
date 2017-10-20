@@ -184,6 +184,7 @@
                        (iterate run-player-method method-context)))
         next-melody-event (play-melody-event (last melody)
                                              (get-next-melody-event
+                                              ensemble
                                               new-player
                                               melody
                                               player-id)

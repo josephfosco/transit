@@ -54,7 +54,7 @@
   )
 
 (defn get-random-melody-event
-  [player rnd-evnt next-id]
+  [ensemble player melody player-id rnd-evnt next-id]
   (if (or (:rest? rnd-evnt) (= (rand-int 2) 0))
     (get-random-rest-event player next-id)
     (get-random-note-event player next-id)

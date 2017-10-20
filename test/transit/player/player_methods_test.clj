@@ -21,6 +21,7 @@
    )
   (:import
    [transit.player.structures.motif Motif]
+   [transit.player.structures.random_event RandomEvent]
    )
   (:use clojure.test
         transit.player.player-methods
@@ -82,7 +83,7 @@
   )
 
 (deftest test-remove-structure-type
-  (testing "removes all structures af a type from player"
+  (testing "removes all structures of a type from player"
     (let [struct1 (create-random-event)
           struct2 (create-motif)
           struct3 (create-random-event)
@@ -92,6 +93,20 @@
                         )]
         (is (= (assoc player :structures [struct1 struct3])
              (remove-structure-type player Motif)
+             )
+            ))
+    )
+
+  (testing "removes all structures in a list from player"
+    (let [struct1 (create-random-event)
+          struct2 (create-motif)
+          struct3 (create-random-event)
+          struct4 (create-motif)
+          player (assoc (create-player :id 1)
+                        :structures [struct1 struct2 struct3 struct4]
+                        )]
+        (is (= (assoc player :structures [])
+               (remove-structure-type player '(RandomEvent Motif))
              )
             ))
     )

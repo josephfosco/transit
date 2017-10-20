@@ -21,6 +21,14 @@
    )
   )
 
+
+(def ^:private MOTIF-MIN-LEN 2)
+(def ^:private MOTIF-MAX-LEN 12)
+(def ^:private MOTIF-MAX-SKIP 12)
+(def ^:private MOTIF-MAX-NUM-SKIPS 3)
+(def ^:private MOTIF-MIN-MILLIS 200)
+(def ^:private MOTIF-MAX-MILLIS 1000)
+
 (defrecord Motif [base
                   melody-event-ids
                   type  ;; FREE or METERED (METERED has mm and rhythmic values)
@@ -28,7 +36,8 @@
                   ])
 
 (defn get-motif-melody-event
-  [player motif next-id]
+  [ensemble player melody player-id motif next-id]
+  (println "##### get-motif-melody-event #####")
   (create-melody-event
    :id next-id
    :note 60
@@ -39,10 +48,21 @@
    :event-time nil
    )
   )
+
 (defn create-motif
-  [& {:keys [melody-event-ids type complete?] :or
-      {melody-event-ids nil complete? false}}]
-  (Motif. (create-base-structure)
+  [& {:keys [internal-strength
+             external-strength
+             melody-event-ids
+             type
+             complete?] :or
+      {internal-strength 0
+       external-strength 0
+       melody-event-ids nil
+       complete? false
+       }}]
+  (Motif. (create-base-structure :internal-strength internal-strength
+                                 :external-strength external-strength
+                                 :melody-fn get-motif-melody-event)
           melody-event-ids
           type
           complete?

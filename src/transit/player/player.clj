@@ -89,17 +89,23 @@
   )
 
 (defn get-next-melody-event
-  [player melody player-id]
+  [ensemble player melody player-id]
   (let [plyr-structs (:structures player)
-        max-strength-index (first (reduce find-high-strength
-                                          [0 0 0]
-                                          plyr-structs
-                                          ))
+        max-strength-index (rand-nth (reduce find-high-strength
+                                             [0 0 0]
+                                             plyr-structs
+                                             ))
         melody-struct (get plyr-structs max-strength-index)
         ]
 
     (if melody-struct
-      ((get-melody-fn melody-struct) player  melody-struct (count melody))
+      ((get-melody-fn melody-struct) ensemble
+                                     player
+                                     melody
+                                     player-id
+                                     melody-struct
+                                     (count melody)
+       )
       (create-melody-event :id (count melody)
                            :note nil
                            :dur-info (select-random-rhythm)

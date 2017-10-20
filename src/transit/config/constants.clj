@@ -19,5 +19,5 @@
    )
   )
 
-(def MIN-MOTIF-MILLIS 200)
-(def MAX-MOTIF-MILLIS 1000)
+(def FREE 0)
+(def METERED 1)
