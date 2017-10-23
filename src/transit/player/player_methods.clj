@@ -17,6 +17,7 @@
   (:require
    [transit.config.constants :refer [FREE METERED]]
    [transit.instr.instrument :refer [select-instrument]]
+   [transit.player.structures.gesture :refer [create-gesture]]
    [transit.player.structures.random-event :refer [create-random-event]]
    [transit.player.structures.motif :refer [create-motif]]
    [transit.melody.melody-event :refer [create-melody-event
@@ -28,6 +29,7 @@
    [transit.melody.volume :refer [select-random-volume]]
    )
   (:import
+   [transit.player.structures.gesture Gesture]
    [transit.player.structures.random_event RandomEvent]
    [transit.player.structures.motif Motif]
    )
@@ -127,6 +129,8 @@
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
+(declare build-gesture)
+(declare build-motif)
 (defn select-instrument-for-player
   [[ensemble player melody player-id rtn-map :as args]]
   (println "******  select-instrument-for-player  ******" player-id)
@@ -134,11 +138,14 @@
         first-instrument? (nil? (:instrument player))
         new-instrument (select-instrument args)
         new-player (if first-instrument?
-                     (assoc (remove-structure-type player '(Motif RandomEvent))
+                     (assoc (remove-structure-type player '(Gesture
+                                                            Motif
+                                                            RandomEvent))
                             :instrument-info new-instrument
                             :methods (add-methods cur-methods
                                                   play-random 10
-                                                  build-motif 10
+                                                  build-motif 5
+                                                  build-gesture 5
                                                   )
                             )
                      (assoc player
@@ -218,6 +225,22 @@
 
 
 ;; TOP DOWN METHODS
+
+(defn build-gesture
+  [[ensemble player melody player-id rtn-map]]
+  (println "******  build-gesture  ******" player-id)
+  [ensemble
+   (assoc player :structures
+          (assoc (:structures player)
+                 (count (:structures player))
+                 (create-gesture :internal-strength 1
+                               :type FREE)
+                 ))
+   melody
+   player-id
+   {:status OK}
+   ]
+  )
 
 (defn build-motif
   [[ensemble player melody player-id rtn-map]]

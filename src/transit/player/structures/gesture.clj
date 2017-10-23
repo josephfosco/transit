@@ -13,7 +13,7 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.player.structures.motif
+(ns transit.player.structures.gesture
   (:require
    [transit.melody.melody-event :refer [create-melody-event]]
    [transit.melody.rhythm :refer [select-random-rhythm]]
@@ -22,38 +22,38 @@
   )
 
 
-(def ^:private MOTIF-MIN-LEN 2)
-(def ^:private MOTIF-MAX-LEN 12)
-(def ^:private MOTIF-MAX-SKIP 12)
-(def ^:private MOTIF-MAX-NUM-SKIPS 3)
-(def ^:private MOTIF-MIN-MILLIS 200)
-(def ^:private MOTIF-MAX-MILLIS 1000)
+(def ^:private GESTURE-MIN-LEN 2)
+(def ^:private GESTURE-MAX-LEN 12)
+(def ^:private GESTURE-MAX-SKIP 12)
+(def ^:private GESTURE-MAX-NUM-SKIPS 3)
+(def ^:private GESTURE-MIN-MILLIS 200)
+(def ^:private GESTURE-MAX-MILLIS 1000)
 
-(defrecord Motif [base
-                  motif-events
-                  type  ;; FREE or METERED (METERED has mm and rhythmic values)
-                  complete? ;; is this a complete motif
-                  ])
+(defrecord Gesture [base
+                    gesture-events
+                    type  ;; FREE or METERED (METERED has mm and rhythmic values)
+                    complete? ;; is this a complete gesture
+                    ])
 
-(defn find-motif
+(defn find-gesture
  " Looks through past melody events for material that can be used to
-   create a motif"
+   create a gesture"
   [melody]
-  (let [possible-motif
+  (let [possible-gesture
         (for [event (reverse melody) :while (not= nil (:note event))]
           {:note (:note event) :dur-info (:dur-info event)})]
-    (if (>= (count possible-motif) MOTIF-MIN-LEN)
-      possible-motif
+    (if (>= (count possible-gesture) GESTURE-MIN-LEN)
+      possible-gesture
       nil
       )
     )
  )
 
 (defn next-melody-event
-  [ensemble player melody player-id motif next-id]
-  (if-let [motif (find-motif melody)]
+  [ensemble player melody player-id gesture next-id]
+  (if-let [gesture (find-gesture melody)]
     (do
-      (println "!!!!!found-motif " motif)
+      (println "$$$$$$ found-gesture " gesture)
       (create-melody-event
        :id next-id
        :note 72
@@ -75,16 +75,16 @@
     )
   )
 
-(defn get-motif-melody-event
-  [ensemble player melody player-id motif next-id]
-  (println "##### get-motif-melody-event #####")
-  (next-melody-event ensemble player melody player-id motif next-id)
+(defn get-gesture-melody-event
+  [ensemble player melody player-id gesture next-id]
+  (println "##### get-gesture-melody-event #####")
+  (next-melody-event ensemble player melody player-id gesture next-id)
   )
 
-(defn create-motif
+(defn create-gesture
   [& {:keys [internal-strength
              external-strength
-             motif-events
+             gesture-events
              type
              complete?] :or
       {internal-strength 0
@@ -92,10 +92,10 @@
        melody-events []
        complete? false
        }}]
-  (Motif. (create-base-structure :internal-strength internal-strength
+  (Gesture. (create-base-structure :internal-strength internal-strength
                                  :external-strength external-strength
-                                 :melody-fn get-motif-melody-event)
-          motif-events
+                                 :melody-fn get-gesture-melody-event)
+          gesture-events
           type
           complete?
           )
