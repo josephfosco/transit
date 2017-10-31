@@ -88,6 +88,18 @@
     )
   )
 
+(defn create-random-rest-melody-event
+  [player-id event-id]
+  (create-melody-event :id event-id
+                       :note nil
+                       :dur-info (select-random-rhythm)
+                       :volume nil
+                       :instrument-info nil
+                       :player-id player-id
+                       :event-time nil
+                       )
+  )
+
 (defn get-next-melody-event
   [ensemble player melody player-id]
   (let [plyr-structs (:structures player)
@@ -97,23 +109,29 @@
                                              ))
         melody-struct (get plyr-structs max-strength-index)
         ]
-
     (if melody-struct
-      ((get-melody-fn melody-struct) ensemble
-                                     player
-                                     melody
-                                     player-id
-                                     melody-struct
-                                     (count melody)
-       )
-      (create-melody-event :id (count melody)
-                           :note nil
-                           :dur-info (select-random-rhythm)
-                           :volume nil
-                           :instrument-info nil
-                           :player-id player-id
-                           :event-time nil
-                           )
+      (do
+        (let [[new-struct melody-event]
+              ((get-melody-fn melody-struct) ensemble
+                                             player
+                                             melody
+                                             player-id
+                                             melody-struct
+                                             (count melody)
+               )]
+          (if melody-event
+            [(assoc player
+                    :structures
+                    (assoc plyr-structs max-strength-index new-struct))
+             melody-event
+             ]
+            [player
+             (create-random-rest-melody-event player-id (count melody))
+             ]
+            )))
+      [player
+       (create-random-rest-melody-event player-id (count melody))
+       ]
       )
     )
   )

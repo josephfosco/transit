@@ -42,6 +42,23 @@
   (:melody-fn (:base struct))
   )
 
+(defn get-internal-strength
+  [struct]
+  (:internal-strength (:base struct))
+  )
+
+(defn struct-updated
+  [struct]
+  (assoc struct :base (assoc (:base struct) :updated-at (System/currentTimeMillis)))
+  )
+
+(defn set-internal-strength
+  [struct new-int-strength]
+  (struct-updated (assoc struct :base (assoc (:base struct)
+                                             :internal-strength
+                                             (min 100 new-int-strength))))
+  )
+
 (defn create-base-structure
   [& {:keys [internal-strength external-strength strength-fn melody-fn] :or
       {internal-strength 0

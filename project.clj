@@ -19,7 +19,7 @@
   :license {:name "GNU General Public License version 3"
             :url "http://www.gnu.org/licenses/"}
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [overtone "0.10.1"]
+                 [overtone "0.10.3"]
                  ]
   :jvm-opts ^:replace [] ;; turns off JVM arg TieredStopAtLevel=1
   :main ^:skip-aot transit.core

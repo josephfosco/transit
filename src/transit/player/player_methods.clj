@@ -144,7 +144,7 @@
                             :instrument-info new-instrument
                             :methods (add-methods cur-methods
                                                   play-random 10
-                                                  build-motif 5
+                                                  build-motif 1
                                                   build-gesture 5
                                                   )
                             )

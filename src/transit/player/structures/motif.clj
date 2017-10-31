@@ -53,31 +53,29 @@
   [ensemble player melody player-id motif next-id]
   (if-let [motif (find-motif melody)]
     (do
-      (println "!!!!!found-motif " motif)
-      (create-melody-event
-       :id next-id
-       :note 72
-       :dur-info (select-random-rhythm)
-       :volume 0.7
-       :instrument-info (:instrument-info player)
-       :player-id (:id player)
-       :event-time nil
-       ))
-    (create-melody-event
-     :id next-id
-     :note 60
-     :dur-info (select-random-rhythm)
-     :volume 0.7
-     :instrument-info (:instrument-info player)
-     :player-id (:id player)
-     :event-time nil
-     )
+      [motif (create-melody-event :id next-id
+                                   :note 72
+                                   :dur-info (select-random-rhythm)
+                                   :volume 0.7
+                                   :instrument-info (:instrument-info player)
+                                   :player-id (:id player)
+                                   :event-time nil
+                                   )
+       ])
+    [motif (create-melody-event :id next-id
+                                 :note 60
+                                 :dur-info (select-random-rhythm)
+                                 :volume 0.7
+                                 :instrument-info (:instrument-info player)
+                                 :player-id (:id player)
+                                 :event-time nil
+                                 )
+     ]
     )
   )
 
 (defn get-motif-melody-event
   [ensemble player melody player-id motif next-id]
-  (println "##### get-motif-melody-event #####")
   (next-melody-event ensemble player melody player-id motif next-id)
   )
 

@@ -182,18 +182,19 @@
         [_ new-player melody player-id rtn-map]
         (first (filter (partial stop-running-methods? event-time)
                        (iterate run-player-method method-context)))
-        next-melody-event (play-melody-event (last melody)
-                                             (get-next-melody-event
-                                              ensemble
-                                              new-player
-                                              melody
-                                              player-id)
-                                             event-time)
-        upd-melody (assoc melody (count melody) next-melody-event)
+        [upd-player next-melody-event] (get-next-melody-event
+                                        ensemble
+                                        new-player
+                                        melody
+                                        player-id)
+        upd-melody-event (play-melody-event (last melody)
+                                            next-melody-event
+                                            event-time)
+        upd-melody (assoc melody (count melody) upd-melody-event)
         ]
-    (check-prior-event-note-off (last melody) next-melody-event)
-    (sched-next-note next-melody-event)
-    (update-player-and-melody new-player upd-melody player-id)
+    (check-prior-event-note-off (last melody) upd-melody-event)
+    (sched-next-note upd-melody-event)
+    (update-player-and-melody upd-player upd-melody player-id)
     (println (- (System/currentTimeMillis) event-time))
     )
  )
