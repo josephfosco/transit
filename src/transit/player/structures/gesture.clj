@@ -25,8 +25,8 @@
   )
 
 
-(def ^:private GESTURE-MIN-LEN 2)
-(def ^:private GESTURE-MAX-LEN 4)
+(def ^:private GESTURE-MIN-NOTES 2)
+(def ^:private GESTURE-MAX-NOTES 4)
 (def ^:private GESTURE-MAX-SKIP 12)
 (def ^:private GESTURE-MAX-NUM-SKIPS 3)
 (def ^:private GESTURE-MIN-MILLIS 200)
@@ -37,6 +37,8 @@
                     type  ;; FREE or METERED (METERED has mm and rhythmic values)
                     complete? ;; is this a complete gesture
                     next-gesture-event-ndx
+                    last-gesture-melody-event
+                    orig-internal-strength
                     ])
 
 (defn get-next-gesture-event
@@ -47,11 +49,24 @@
                             (:next-gesture-event-ndx gesture))]
     (println "@@@@@@ PLAYING GESTURE EVENT @@@@@@@@")
     [
-     (assoc (set-internal-strength gesture
-                                   (* 2 (get-internal-strength gesture)))
+     ;; increase internal-strength for each note of gesture played
+     ;; after playing last note of gesture reset internal-strength
+     ;; to it's original value
+     (assoc (set-internal-strength
+             gesture
+             (if (< (:next-gesture-event-ndx gesture)
+                    (count (:gesture-events gesture)))
+               (* 3 (get-internal-strength gesture))
+               (:orig-internal-strength gesture)
+               )
+
+             )
             :next-gesture-event-ndx
             (mod (inc (:next-gesture-event-ndx gesture))
-                 (count (:gesture-events gesture))))
+                 (count (:gesture-events gesture)))
+            :last-gesture-melody-event
+            event-id
+            )
      (create-melody-event :id event-id
                           :note (:note next-gesture-event)
                           :dur-info (:dur-info next-gesture-event)
@@ -71,10 +86,10 @@
   (let [possible-gesture
         (for [event (reverse melody) :while (not= nil (:note event))]
           {:note (:note event) :dur-info (:dur-info event)})]
-    (cond (<= GESTURE-MIN-LEN (count possible-gesture)  GESTURE-MAX-LEN)
+    (cond (<= GESTURE-MIN-NOTES (count possible-gesture)  GESTURE-MAX-NOTES)
           (vec possible-gesture)
-          (> (count possible-gesture)  GESTURE-MAX-LEN)
-          (let [ges-len (inc (rand-int GESTURE-MAX-LEN))
+          (> (count possible-gesture)  GESTURE-MAX-NOTES)
+          (let [ges-len (inc (rand-int GESTURE-MAX-NOTES))
                 ges-start (- (rand-int (count possible-gesture)) ges-len)
                 ]
             (vec (take ges-len (nthnext ges-start)))
@@ -138,5 +153,7 @@
           type
           complete?
           nil  ;; next-gesture-event-ndx
+          0  ;; last-gesture-melody-event
+          internal-strength  ;; orig-internal-strength
           )
   )
