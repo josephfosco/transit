@@ -17,7 +17,8 @@
 
 (def MAX_STRUCTURE_STRENGTH 100.0)
 
-(defrecord BaseStructure [internal-strength
+(defrecord BaseStructure [struct-id
+                          internal-strength
                           external-strength
                           strength-fn
                           melody-fn
@@ -59,13 +60,24 @@
                                              (min 100 new-int-strength))))
   )
 
+(defn set-struct-id
+  [struct new-struct-id]
+  (assoc struct :base (assoc (:base struct) :struct-id new-struct-id))
+  )
+
 (defn create-base-structure
-  [& {:keys [internal-strength external-strength strength-fn melody-fn] :or
-      {internal-strength 0
+  [& {:keys [struct-id
+             internal-strength
+             external-strength
+             strength-fn
+             melody-fn] :or
+      {struct-id "none"
+       internal-strength 0
        external-strength 0
        strength-fn get-base-strength
        }}]
-  (BaseStructure. internal-strength
+  (BaseStructure. struct-id
+                  internal-strength
                   external-strength
                   strength-fn
                   melody-fn

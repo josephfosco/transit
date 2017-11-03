@@ -136,7 +136,8 @@
   )
 
 (defn create-gesture
-  [& {:keys [internal-strength
+  [& {:keys [struct-id
+             internal-strength
              external-strength
              gesture-events
              type
@@ -146,9 +147,10 @@
        melody-events []
        complete? false
        }}]
-  (Gesture. (create-base-structure :internal-strength internal-strength
-                                 :external-strength external-strength
-                                 :melody-fn get-gesture-melody-event)
+  (Gesture. (create-base-structure :struct-id struct-id
+                                   :internal-strength internal-strength
+                                   :external-strength external-strength
+                                   :melody-fn get-gesture-melody-event)
           gesture-events
           type
           complete?

@@ -17,6 +17,7 @@
   (:require
    [transit.config.constants :refer [FREE METERED]]
    [transit.instr.instrument :refer [select-instrument]]
+   [transit.player.structures.base-structure :refer [set-struct-id]]
    [transit.player.structures.gesture :refer [create-gesture]]
    [transit.player.structures.random-event :refer [create-random-event]]
    [transit.player.structures.motif :refer [create-motif]]
@@ -84,6 +85,21 @@
 
   )
 
+(defn next-struct-id
+  [player]
+  (str (:id player) "-" (str (:next-struct-num player)))
+  )
+
+(defn add-structure
+  [player structure]
+  (assoc player
+         :structures (assoc (:structures player)
+                                   (count (:structures player))
+                                   (set-struct-id structure
+                                                  (next-struct-id player))
+                                   )
+         :next-struct-id (inc (:next-struct-num player))
+         ))
 
 ;; --------------------------------------------------
 
@@ -97,11 +113,8 @@
   [[ensemble player melody player-id rtn-map]]
   (println "******  play-random-rest  ******" player-id)
   [ensemble
-   (assoc player :structures
-          (assoc (:structures player)
-                 (count (:structures player))
-                 (create-random-event :internal-strength 1 :rest? true)
-                 ))
+   (add-structure player
+                  (create-random-event :internal-strength 1 :rest? true))
    melody
    player-id
    {:status OK}
@@ -112,11 +125,8 @@
   [[ensemble player melody player-id rtn-map]]
   (println "******  play-random  ******" player-id)
   [ensemble
-   (assoc player :structures
-          (assoc (:structures player)
-                 (count (:structures player))
-                 (create-random-event :internal-strength 1)
-                 ))
+   (add-structure player
+                  (create-random-event :internal-strength 1))
    melody
    player-id
    {:status OK}
@@ -230,12 +240,10 @@
   [[ensemble player melody player-id rtn-map]]
   (println "******  build-gesture  ******" player-id)
   [ensemble
-   (assoc player :structures
-          (assoc (:structures player)
-                 (count (:structures player))
-                 (create-gesture :internal-strength 1
-                               :type FREE)
-                 ))
+   (add-structure player (create-gesture :internal-strength 1
+                                        :type FREE
+                                        :struct-id (next-struct-id player))
+                        )
    melody
    player-id
    {:status OK}
@@ -246,12 +254,9 @@
   [[ensemble player melody player-id rtn-map]]
   (println "******  build-motif  ******" player-id)
   [ensemble
-   (assoc player :structures
-          (assoc (:structures player)
-                 (count (:structures player))
-                 (create-motif :internal-strength 1
-                               :type FREE)
-                 ))
+   (add-structure player
+                  (create-motif :internal-strength 1
+                                :type FREE))
    melody
    player-id
    {:status OK}
