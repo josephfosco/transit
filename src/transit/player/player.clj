@@ -99,7 +99,7 @@
 
 (defn create-random-rest-melody-event
   [player-id event-id]
-  (create-melody-event :id event-id
+  (create-melody-event :melody-event-id event-id
                        :note nil
                        :dur-info (select-random-rhythm)
                        :volume nil
@@ -121,12 +121,13 @@
     (if melody-struct
       (do
         (let [[new-struct melody-event]
-              ((get-melody-fn melody-struct) ensemble
-                                             player
-                                             melody
-                                             player-id
-                                             melody-struct
-                                             (count melody)
+              ((get-melody-fn melody-struct)
+               ensemble
+               player
+               melody
+               player-id
+               melody-struct
+               (inc (:melody-event-id (last melody)))
                )]
           (if melody-event
             [(assoc player
@@ -135,11 +136,14 @@
              melody-event
              ]
             [player
-             (create-random-rest-melody-event player-id (count melody))
+             (create-random-rest-melody-event
+              player-id
+              (inc (:melody-event-id (last melody))))
              ]
             )))
       [player
-       (create-random-rest-melody-event player-id (count melody))
+       (create-random-rest-melody-event player-id
+                                        (inc (:melody-event-id (last melody))))
        ]
       )
     )

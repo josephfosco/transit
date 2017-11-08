@@ -21,8 +21,7 @@
    [transit.player.structures.gesture :refer [create-gesture]]
    [transit.player.structures.random-event :refer [create-random-event]]
    [transit.player.structures.motif :refer [create-motif]]
-   [transit.melody.melody-event :refer [create-melody-event
-                                        get-dur-millis-from-melody-event
+   [transit.melody.melody-event :refer [get-dur-millis-from-melody-event
                                         get-note-from-melody-event]]
    [transit.melody.pitch :refer [select-random-key
                                  select-random-pitch]]

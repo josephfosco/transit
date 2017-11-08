@@ -42,9 +42,9 @@
                     ])
 
 (defn get-next-gesture-event
-  [player event-id gesture]
+  [player next-melody-id gesture]
   (println "!!!!!! get-next-gesture-event  !!!!!")
-  (println event-id gesture)
+  (println next-melody-id gesture)
   (let [next-gesture-event ((:gesture-events gesture)
                             (:next-gesture-event-ndx gesture))]
     (println "@@@@@@ PLAYING GESTURE EVENT @@@@@@@@")
@@ -65,9 +65,9 @@
             (mod (inc (:next-gesture-event-ndx gesture))
                  (count (:gesture-events gesture)))
             :last-gesture-melody-event
-            event-id
+            next-melody-id
             )
-     (create-melody-event :id event-id
+     (create-melody-event :melody-event-id next-melody-id
                           :note (:note next-gesture-event)
                           :dur-info (:dur-info next-gesture-event)
                           :volume 0.7
@@ -111,28 +111,28 @@
     )
   )
 
-(defn next-melody-event
-  [ensemble player melody player-id gesture next-id]
+(defn get-gesture-melody-event
+  [ensemble player melody player-id gesture next-melody-id]
   (if (= (:gesture-events gesture) nil)
     (let [new-gesture (complete-gesture-struct gesture melody)]
       (if (not (nil? (:next-gesture-event-ndx new-gesture)))
         (do
           (println "$$$$$$ found-gesture " (:gesture-events new-gesture))
           (println "&&& new-gesture: " new-gesture)
-          (get-next-gesture-event player next-id new-gesture)
+          (get-next-gesture-event player next-melody-id new-gesture)
           )
         [gesture nil]
         )
       )
     (do
       (println "%%%%%%%%  Playing Existing Gesture  %%%%%%%%%%")
-      [gesture (get-next-gesture-event player next-id gesture)])
+      (if (not = next-melody-id (count melody))
+        ;; last melody event was not from gesture, start gesture from beginning
+        (get-next-gesture-event player
+                                next-melody-id
+                                (assoc gesture :next-gesture-event-ndx 0))
+        (get-next-gesture-event player next-melody-id gesture)))
     )
-  )
-
-(defn get-gesture-melody-event
-  [ensemble player melody player-id gesture next-id]
-  (next-melody-event ensemble player melody player-id gesture next-id)
   )
 
 (defn create-gesture

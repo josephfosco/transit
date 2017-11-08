@@ -20,6 +20,7 @@
                                          get-instrument-from-instrument-info]]
    [transit.instr.sc-instrument :refer [stop-instrument]]
    [transit.config.config :refer [get-setting]]
+   [transit.config.constants :refer [SAVED-MELODY-LEN]]
    [transit.ensemble.ensemble :refer [get-ensemble
                                       get-melody
                                       get-player
@@ -55,6 +56,17 @@
    false - if player is not playing now
  "
  [player]
+  )
+
+(defn update-melody-with-event
+  [melody melody-event]
+  ;; Adds melody-event to the end of the melody vector
+  ;; Does not allow melody-vector to have more than SAVED-MELODY-LEN
+  ;; elements in it
+  (if (= (count melody) SAVED-MELODY-LEN)
+    (assoc (subvec melody 1) (dec SAVED-MELODY-LEN) melody-event)
+    (assoc melody (count melody) melody-event)
+    )
   )
 
 (defn select-method
@@ -190,7 +202,8 @@
         upd-melody-event (play-melody-event (last melody)
                                             next-melody-event
                                             event-time)
-        upd-melody (assoc melody (count melody) upd-melody-event)
+        upd-melody (update-melody-with-event melody upd-melody-event)
+
         ]
     (check-prior-event-note-off (last melody) upd-melody-event)
     (sched-next-note upd-melody-event)

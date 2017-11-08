@@ -19,5 +19,7 @@
    )
   )
 
+(def SAVED-MELODY-LEN 64)
+
 (def FREE 0)
 (def METERED 1)

@@ -42,7 +42,7 @@
 (defn init-melody
   [player-id]
 
-  (vector (create-melody-event :id 0
+  (vector (create-melody-event :melody-event-id 0
                                :note nil
                                :dur-info nil
                                :volume nil

@@ -21,7 +21,16 @@
    )
   )
 
-(defrecord MelodyEvent [id note dur-info volume instrument-info player-id event-time play-time sc-instrument-id note-off])
+(defrecord MelodyEvent [melody-event-id
+                        note
+                        dur-info
+                        volume
+                        instrument-info
+                        player-id
+                        event-time
+                        play-time
+                        sc-instrument-id
+                        note-off])
 
 ;; MelodyEvent fields
 ;;  id   - id sequence of melody event - 0 is initial blank event
@@ -50,8 +59,8 @@
   )
 
 (defn create-melody-event
-  [& {:keys [:id :note :dur-info :volume :instrument-info :player-id :event-time :play-time :sc-instrument-id]}]
-  (MelodyEvent. id
+  [& {:keys [:melody-event-id :note :dur-info :volume :instrument-info :player-id :event-time :play-time :sc-instrument-id]}]
+  (MelodyEvent. melody-event-id
                 note
                 dur-info
                 volume

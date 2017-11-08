@@ -29,7 +29,7 @@
 (defn get-random-note-event
   [player next-id]
   (create-melody-event
-   :id next-id
+   :melody-event-id next-id
    :note (select-random-pitch (:range-lo (:instrument-info player))
                               (:range-hi (:instrument-info player)))
    :dur-info (select-random-rhythm)
@@ -43,7 +43,7 @@
 (defn get-random-rest-event
   [player next-id]
   (create-melody-event
-   :id next-id
+   :melody-event-id next-id
    :note nil
    :dur-info (select-random-rhythm)
    :volume nil
