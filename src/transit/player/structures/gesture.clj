@@ -44,6 +44,7 @@
 (defn get-next-gesture-event
   [player next-melody-id gesture]
   (println "!!!!!! get-next-gesture-event  !!!!!")
+  (println "player-id: " (:id player))
   (println next-melody-id gesture)
   (let [next-gesture-event ((:gesture-events gesture)
                             (:next-gesture-event-ndx gesture))]
@@ -55,7 +56,7 @@
      (assoc (set-internal-strength
              gesture
              (if (< (:next-gesture-event-ndx gesture)
-                    (count (:gesture-events gesture)))
+                    (dec (count (:gesture-events gesture))))
                (* 3 (get-internal-strength gesture))
                (:orig-internal-strength gesture)
                )

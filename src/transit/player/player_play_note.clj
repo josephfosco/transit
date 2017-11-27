@@ -142,12 +142,10 @@
 (declare play-next-note)
 (defn sched-next-note
   [melody-event]
-  (println (get-player-id-from-melody-event melody-event) "sched-next-note")
   (let [next-time (- (+ (get-event-time-from-melody-event melody-event)
                         (get-dur-millis-from-melody-event melody-event)
                         )
                      METHOD-PROCESS-MILLIS)]
-    (println (get-player-id-from-melody-event melody-event) "sched-next-note - next-time:" next-time)
     (apply-at next-time
               play-next-note
               [(get-player-id-from-melody-event melody-event) next-time]
