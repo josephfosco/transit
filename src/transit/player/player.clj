@@ -27,6 +27,7 @@
                                                      get-strength-fn]]
    [transit.melody.melody-event :refer [create-melody-event]]
    [transit.melody.rhythm :refer [select-random-rhythm]]
+   [transit.util.random :refer [weighted-choice]]
    )
   (:import transit.player.player_methods.MethodInfo)
   )
@@ -79,23 +80,27 @@
   (:instrument-info player))
 
 (defn find-high-strength
-  " A reducing function to find the index of the struct with the highest strength
-    Calls strength-fn from struct and if it is > then the current highest
-      strength (returns a result containing information for the current struct
+  " A reducing function to find the index of the structr with the highest strength
+    Calls strength-fn from structr and if it is > then the current highest
+      strength (returns a result containing information for the current structr
     rslt is an array of 3 elements
       [ index of structure with the highest strength so far
         value of highest strength so far
         index for the next structure
       ]
   "
-  [rslt struct]
-  (let [new-strength ((get-strength-fn struct) struct)]
+  [rslt structr]
+  (let [new-strength ((get-strength-fn structr) structr)]
     (if (< (second rslt) new-strength)
       [(rslt 2) new-strength (inc (rslt 2))]
       [(first rslt) (second rslt) (inc (rslt 2))]
       )
     )
   )
+
+(defn get-struct-strength
+  [structr]
+  ((get-strength-fn structr) structr))
 
 (defn create-random-rest-melody-event
   [player-id event-id]
@@ -112,12 +117,15 @@
 (defn get-next-melody-event
   [ensemble player melody player-id]
   (let [plyr-structs (:structures player)
-        max-strength-index (rand-nth (reduce find-high-strength
-                                             [0 0 0]
-                                             plyr-structs
-                                             ))
-        melody-struct (get plyr-structs max-strength-index)
+        all-weights (mapv get-struct-strength plyr-structs)
+        selected-struct-index (if (> (count all-weights) 0)
+                                (weighted-choice all-weights)
+                                nil)
+        melody-struct (if selected-struct-index
+                        (get plyr-structs selected-struct-index)
+                        nil)
         ]
+    (println "all-weights: " all-weights)
     (if melody-struct
       (do
         (let [[new-struct melody-event]
@@ -132,7 +140,7 @@
           (if melody-event
             [(assoc player
                     :structures
-                    (assoc plyr-structs max-strength-index new-struct))
+                    (assoc plyr-structs selected-struct-index new-struct))
              melody-event
              ]
             [player
@@ -165,7 +173,7 @@
           (doseq [method-info (get player :methods)]
             (println "   " (type (:method method-info))
                      " weight: " (:weight method-info)
-                     " time: " (time method-info)
+                     " created-at:: " (:created-at method-info)
                      )
             ))
         (and (= player-key :instrument-info) (= prnt-full-inst-info false))
@@ -173,6 +181,11 @@
           (println (format "%-29s" (str "  " player-key " :name")) "-" (:name (:instrument (:instrument-info player))))
           (println (format "%-29s" (str "  " player-key " :range-lo")) "-" (:range-lo (:instrument-info player)))
           (println (format "%-29s" (str "  " player-key " :range-hi")) "-" (:range-hi (:instrument-info player))))
+        (= player-key :structures)
+        (do
+          (println " " player-key)
+          (doseq [structr (:structures player)] (println "   " structr))
+          )
         :else
         (println (format "%-20s" (str "  " player-key)) "-" (get player player-key)))
       )

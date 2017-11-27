@@ -76,11 +76,14 @@
 
 (defn get-motif-melody-event
   [ensemble player melody player-id motif next-id]
-  (next-melody-event ensemble player melody player-id motif next-id)
+  [motif
+   (next-melody-event ensemble player melody player-id motif next-id)
+   ]
   )
 
 (defn create-motif
-  [& {:keys [internal-strength
+  [& {:keys [struct-id
+             internal-strength
              external-strength
              motif-events
              type
@@ -90,7 +93,8 @@
        melody-events []
        complete? false
        }}]
-  (Motif. (create-base-structure :internal-strength internal-strength
+  (Motif. (create-base-structure :struct-id struct-id
+                                 :internal-strength internal-strength
                                  :external-strength external-strength
                                  :melody-fn get-motif-melody-event)
           motif-events

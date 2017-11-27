@@ -18,8 +18,8 @@
    [transit.config.constants :refer [FREE METERED]]
    [transit.instr.instrument :refer [select-instrument]]
    [transit.player.structures.base-structure :refer [set-struct-id]]
-   [transit.player.structures.gesture :refer [create-gesture]]
-   [transit.player.structures.random-event :refer [create-random-event]]
+   [transit.player.structures.gesture :refer [create-gesture-struct]]
+   [transit.player.structures.random-event :refer [create-random-struct]]
    [transit.player.structures.motif :refer [create-motif]]
    [transit.melody.melody-event :refer [get-dur-millis-from-melody-event
                                         get-note-from-melody-event]]
@@ -69,17 +69,17 @@
          ))
 
 (defn remove-structure-type
-  [player struct-type & {:keys [:time] :or {time nil}}]
-  (if (list? struct-type)
+  [player structr-type & {:keys [:time] :or {time nil}}]
+  (if (list? structr-type)
     (assoc player
            :structures
-           (vec (for [struct (:Structures player)
-                      :when (not-any? #{struct} struct-type)]
+           (vec (for [structr (:Structures player)
+                      :when (not-any? #{structr} structr-type)]
                   struct
                   )))
     (assoc player
            :structures
-           (vec (filter #(not= struct-type (type %)) (:structures player)))
+           (vec (filter #(not= structr-type (type %)) (:structures player)))
            ))
 
   )
@@ -97,7 +97,7 @@
                                    (set-struct-id structure
                                                   (next-struct-id player))
                                    )
-         :next-struct-id (inc (:next-struct-num player))
+         :next-struct-num (inc (:next-struct-num player))
          ))
 
 ;; --------------------------------------------------
@@ -113,7 +113,7 @@
   (println "******  play-random-rest  ******" player-id)
   [ensemble
    (add-structure player
-                  (create-random-event :internal-strength 1 :rest? true))
+                  (create-random-struct :internal-strength 1 :rest? true))
    melody
    player-id
    {:status OK}
@@ -125,7 +125,7 @@
   (println "******  play-random  ******" player-id)
   [ensemble
    (add-structure player
-                  (create-random-event :internal-strength 1))
+                  (create-random-struct :internal-strength 1))
    melody
    player-id
    {:status OK}
@@ -153,7 +153,6 @@
                             :instrument-info new-instrument
                             :methods (add-methods cur-methods
                                                   play-random 10
-                                                  build-motif 1
                                                   build-gesture 5
                                                   )
                             )
@@ -239,9 +238,8 @@
   [[ensemble player melody player-id rtn-map]]
   (println "******  build-gesture  ******" player-id)
   [ensemble
-   (add-structure player (create-gesture :internal-strength 1
-                                        :type FREE
-                                        :struct-id (next-struct-id player))
+   (add-structure player (create-gesture-struct :internal-strength 1
+                                                :type FREE)
                         )
    melody
    player-id

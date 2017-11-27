@@ -61,14 +61,16 @@
     )
   )
 
-(defn create-random-event
-  [& {:keys [internal-strength
+(defn create-random-struct
+  [& {:keys [struct-id
+             internal-strength
              external-strength
              rest?] :or
       {internal-strength 0
        external-strength 0
        rest? nil}}]
-  (RandomEvent. (create-base-structure :internal-strength internal-strength
+  (RandomEvent. (create-base-structure :struct-id struct-id
+                                       :internal-strength internal-strength
                                        :external-strength external-strength
                                        :melody-fn get-random-melody-event)
                  rest?

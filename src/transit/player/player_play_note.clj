@@ -142,9 +142,12 @@
 (declare play-next-note)
 (defn sched-next-note
   [melody-event]
+  (println (get-player-id-from-melody-event melody-event) "sched-next-note")
   (let [next-time (- (+ (get-event-time-from-melody-event melody-event)
                         (get-dur-millis-from-melody-event melody-event)
-                        ) METHOD-PROCESS-MILLIS)]
+                        )
+                     METHOD-PROCESS-MILLIS)]
+    (println (get-player-id-from-melody-event melody-event) "sched-next-note - next-time:" next-time)
     (apply-at next-time
               play-next-note
               [(get-player-id-from-melody-event melody-event) next-time]
@@ -184,8 +187,23 @@
     )
   )
 
+(defn check-structures
+  [player]
+  (for [structr (:structures player)
+        :when (not (some #{(type structr)}
+                         '(transit.player.structures.gesture.Gesture
+                           transit.player.structures.random_event.RandomEvent
+                           )))]
+    (do
+      (println player)
+      ;; (println melody-event)
+      (throw (Throwable. "Invalid Structure"))
+      ))
+)
+
 (defn play-next-note
   [player-id sched-time]
+  (println "start -" player-id)
   (let [event-time (+ sched-time METHOD-PROCESS-MILLIS)
         ensemble (get-ensemble)
         player (get-player ensemble player-id)
@@ -208,6 +226,6 @@
     (check-prior-event-note-off (last melody) upd-melody-event)
     (sched-next-note upd-melody-event)
     (update-player-and-melody upd-player upd-melody player-id)
-    (println (- (System/currentTimeMillis) event-time))
+    (println "end -" player-id " - "(- (System/currentTimeMillis) event-time) "melody-event: " (:melody-event-id upd-melody-event))
     )
  )

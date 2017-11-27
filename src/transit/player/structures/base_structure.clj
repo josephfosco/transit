@@ -26,43 +26,43 @@
                           updated-at])
 
 (defn get-base-strength
-  [struct]
-  (let [base-struct (:base struct)]
+  [structr]
+  (let [base-struct (:base structr)]
     (min 100 (+ (:internal-strength base-struct)
                 (:external-strength base-struct)))
     )
   )
 
 (defn get-strength-fn
-  [struct]
-  (:strength-fn (:base struct))
+  [structr]
+  (:strength-fn (:base structr))
   )
 
 (defn get-melody-fn
-  [struct]
-  (:melody-fn (:base struct))
+  [structr]
+  (:melody-fn (:base structr))
   )
 
 (defn get-internal-strength
-  [struct]
-  (:internal-strength (:base struct))
+  [structr]
+  (:internal-strength (:base structr))
   )
 
 (defn struct-updated
-  [struct]
-  (assoc struct :base (assoc (:base struct) :updated-at (System/currentTimeMillis)))
+  [structr]
+  (assoc structr :base (assoc (:base structr) :updated-at (System/currentTimeMillis)))
   )
 
 (defn set-internal-strength
-  [struct new-int-strength]
-  (struct-updated (assoc struct :base (assoc (:base struct)
+  [structr new-int-strength]
+  (struct-updated (assoc structr :base (assoc (:base structr)
                                              :internal-strength
                                              (min 100 new-int-strength))))
   )
 
 (defn set-struct-id
-  [struct new-struct-id]
-  (assoc struct :base (assoc (:base struct) :struct-id new-struct-id))
+  [structr new-struct-id]
+  (assoc structr :base (assoc (:base structr) :struct-id new-struct-id))
   )
 
 (defn create-base-structure

@@ -87,12 +87,12 @@
         (for [event (reverse melody) :while (not= nil (:note event))]
           {:note (:note event) :dur-info (:dur-info event)})]
     (cond (<= GESTURE-MIN-NOTES (count possible-gesture)  GESTURE-MAX-NOTES)
-          (vec possible-gesture)
+          (vec (reverse possible-gesture))
           (> (count possible-gesture)  GESTURE-MAX-NOTES)
           (let [ges-len (inc (rand-int GESTURE-MAX-NOTES))
                 ges-start (- (rand-int (count possible-gesture)) ges-len)
                 ]
-            (vec (take ges-len (nthnext ges-start)))
+            (vec (reverse (take ges-len (nthnext ges-start))))
             )
           :else
           nil
@@ -112,6 +112,8 @@
   )
 
 (defn get-gesture-melody-event
+  "Returns a vector consisting of the gesture (possibly updated) and
+   a melody event (or nil for no melody event found/created)"
   [ensemble player melody player-id gesture next-melody-id]
   (if (= (:gesture-events gesture) nil)
     (let [new-gesture (complete-gesture-struct gesture melody)]
@@ -126,16 +128,19 @@
       )
     (do
       (println "%%%%%%%%  Playing Existing Gesture  %%%%%%%%%%")
-      (if (not = next-melody-id (count melody))
-        ;; last melody event was not from gesture, start gesture from beginning
-        (get-next-gesture-event player
-                                next-melody-id
-                                (assoc gesture :next-gesture-event-ndx 0))
-        (get-next-gesture-event player next-melody-id gesture)))
+      (let [new-gesture (if (not= next-melody-id
+                                  (inc (:last-gesture-melody-event gesture)))
+                          ;; last melody event was not from gesture,
+                          ;; start gesture from beginning
+                          (assoc gesture :next-gesture-event-ndx 0)
+                          gesture
+                          )]
+        (get-next-gesture-event player next-melody-id new-gesture)
+        ))
     )
   )
 
-(defn create-gesture
+(defn create-gesture-struct
   [& {:keys [struct-id
              internal-strength
              external-strength
