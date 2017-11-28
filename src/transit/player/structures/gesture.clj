@@ -19,6 +19,7 @@
    [transit.melody.rhythm :refer [select-random-rhythm]]
    [transit.player.structures.base-structure :refer [create-base-structure
                                                      get-internal-strength
+                                                     reset-internal-strength-to-orig
                                                      set-internal-strength
                                                      struct-updated]]
    )
@@ -38,7 +39,6 @@
                     complete? ;; is this a complete gesture
                     next-gesture-event-ndx
                     last-gesture-melody-event
-                    orig-internal-strength
                     ])
 
 (defn get-next-gesture-event
@@ -53,15 +53,12 @@
      ;; increase internal-strength for each note of gesture played
      ;; after playing last note of gesture reset internal-strength
      ;; to it's original value
-     (assoc (set-internal-strength
-             gesture
-             (if (< (:next-gesture-event-ndx gesture)
-                    (dec (count (:gesture-events gesture))))
-               (* 3 (get-internal-strength gesture))
-               (:orig-internal-strength gesture)
-               )
-
-             )
+     (assoc (if (< (:next-gesture-event-ndx gesture)
+                   (dec (count (:gesture-events gesture))))
+              (set-internal-strength gesture
+                                     (* 3 (get-internal-strength gesture)))
+              (reset-internal-strength-to-orig gesture)
+              )
             :next-gesture-event-ndx
             (mod (inc (:next-gesture-event-ndx gesture))
                  (count (:gesture-events gesture)))
@@ -162,6 +159,5 @@
           complete?
           nil  ;; next-gesture-event-ndx
           0  ;; last-gesture-melody-event
-          internal-strength  ;; orig-internal-strength
           )
   )

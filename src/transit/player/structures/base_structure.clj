@@ -20,6 +20,7 @@
 (defrecord BaseStructure [struct-id
                           internal-strength
                           external-strength
+                          orig-internal-strength
                           strength-fn
                           melody-fn
                           created-at
@@ -60,6 +61,18 @@
                                              (min 100 new-int-strength))))
   )
 
+(defn reset-internal-strength-to-orig
+  [structr]
+  (let [base-structr (:base structr)]
+    (struct-updated (assoc structr
+                           :base
+                           (assoc base-structr
+                                  :internal-strength
+                                  (:orig-internal-strength base-structr)))
+                    )
+    )
+  )
+
 (defn set-struct-id
   [structr new-struct-id]
   (assoc structr :base (assoc (:base structr) :struct-id new-struct-id))
@@ -79,6 +92,7 @@
   (BaseStructure. struct-id
                   internal-strength
                   external-strength
+                  internal-strength  ;; orig-internal-strength
                   strength-fn
                   melody-fn
                   (System/currentTimeMillis)
