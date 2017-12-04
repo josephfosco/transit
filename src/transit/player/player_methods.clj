@@ -17,7 +17,7 @@
   (:require
    [transit.config.constants :refer [FREE METERED]]
    [transit.instr.instrument :refer [select-instrument]]
-   [transit.player.structures.base-structure :refer [set-struct-id]]
+   [transit.player.structures.base-structure :refer [set-structr-id]]
    [transit.player.structures.gesture :refer [create-gesture-struct]]
    [transit.player.structures.random-event :refer [create-random-struct]]
    [transit.player.structures.motif :refer [create-motif]]
@@ -84,7 +84,7 @@
 
   )
 
-(defn next-struct-id
+(defn next-structr-id
   [player]
   (str (:id player) "-" (str (:next-struct-num player)))
   )
@@ -94,8 +94,8 @@
   (assoc player
          :structures (assoc (:structures player)
                                    (count (:structures player))
-                                   (set-struct-id structure
-                                                  (next-struct-id player))
+                                   (set-structr-id structure
+                                                  (next-structr-id player))
                                    )
          :next-struct-num (inc (:next-struct-num player))
          ))

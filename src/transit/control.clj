@@ -49,6 +49,7 @@
                                :instrument-info nil
                                :player-id player-id
                                :event-time 0
+                               :structr-id nil
                                ))
   )
 

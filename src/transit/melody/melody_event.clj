@@ -30,7 +30,9 @@
                         event-time
                         play-time
                         sc-instrument-id
-                        note-off])
+                        note-off
+                        structr-id
+                        ])
 
 ;; MelodyEvent fields
 ;;  id   - id sequence of melody event - 0 is initial blank event
@@ -59,7 +61,16 @@
   )
 
 (defn create-melody-event
-  [& {:keys [:melody-event-id :note :dur-info :volume :instrument-info :player-id :event-time :play-time :sc-instrument-id]}]
+  [& {:keys [:melody-event-id
+             :note
+             :dur-info
+             :volume
+             :instrument-info
+             :player-id
+             :event-time
+             :play-time
+             :sc-instrument-id
+             :structr-id]}]
   (MelodyEvent. melody-event-id
                 note
                 dur-info
@@ -72,6 +83,7 @@
                 (if (nil? note)  ;; set note-off based on other params
                   nil
                   (sched-note-off? note dur-info instrument-info))
+                structr-id
                 )
   )
 
@@ -131,6 +143,11 @@
 (defn get-volume-from-melody-event
  [melody-event]
  (:volume melody-event)
+ )
+
+(defn get-structr-id-from-melody-event
+ [melody-event]
+ (:structr-id melody-event)
  )
 
 (defn print-melody-event

@@ -37,6 +37,7 @@
    :instrument-info (:instrument-info player)
    :player-id (:id player)
    :event-time nil
+   :structr-id nil
    )
   )
 
@@ -50,6 +51,7 @@
    :instrument-info nil
    :player-id (:id player)
    :event-time nil
+   :structr-id nil
    )
   )
 
@@ -62,14 +64,14 @@
   )
 
 (defn create-random-struct
-  [& {:keys [struct-id
+  [& {:keys [structr-id
              internal-strength
              external-strength
              rest?] :or
       {internal-strength 0
        external-strength 0
        rest? nil}}]
-  (RandomEvent. (create-base-structure :struct-id struct-id
+  (RandomEvent. (create-base-structure :structr-id structr-id
                                        :internal-strength internal-strength
                                        :external-strength external-strength
                                        :melody-fn get-random-melody-event)

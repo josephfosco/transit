@@ -17,12 +17,13 @@
 
 (def MAX_STRUCTURE_STRENGTH 100.0)
 
-(defrecord BaseStructure [struct-id
+(defrecord BaseStructure [structr-id
                           internal-strength
                           external-strength
                           orig-internal-strength
                           strength-fn
                           melody-fn
+                          cleanup-fn
                           created-at
                           updated-at])
 
@@ -34,9 +35,19 @@
     )
   )
 
+(defn get-cleanup-fn
+  [structr]
+  (:cleanup-fn (:base structr))
+  )
+
 (defn get-strength-fn
   [structr]
   (:strength-fn (:base structr))
+  )
+
+(defn get-structr-id
+  [structr]
+  (:structr-id (:base structr))
   )
 
 (defn get-melody-fn
@@ -61,6 +72,13 @@
                                              (min 100 new-int-strength))))
   )
 
+(defn set-cleanup-fn
+  [structr cleanup-fn]
+  (struct-updated (assoc structr :base (assoc (:base structr)
+                                             :cleanup-fn
+                                             cleanup-fn)))
+  )
+
 (defn reset-internal-strength-to-orig
   [structr]
   (let [base-structr (:base structr)]
@@ -73,28 +91,31 @@
     )
   )
 
-(defn set-struct-id
-  [structr new-struct-id]
-  (assoc structr :base (assoc (:base structr) :struct-id new-struct-id))
+(defn set-structr-id
+  [structr new-structr-id]
+  (assoc structr :base (assoc (:base structr) :structr-id new-structr-id))
   )
 
 (defn create-base-structure
-  [& {:keys [struct-id
+  [& {:keys [structr-id
              internal-strength
              external-strength
              strength-fn
-             melody-fn] :or
-      {struct-id "none"
+             melody-fn
+             cleanup-fn] :or
+      {structr-id "none"
        internal-strength 0
        external-strength 0
        strength-fn get-base-strength
+       cleanup-fn nil
        }}]
-  (BaseStructure. struct-id
+  (BaseStructure. structr-id
                   internal-strength
                   external-strength
                   internal-strength  ;; orig-internal-strength
                   strength-fn
                   melody-fn
+                  cleanup-fn
                   (System/currentTimeMillis)
                   (System/currentTimeMillis)
                   )

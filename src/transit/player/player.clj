@@ -17,15 +17,17 @@
   (:require
    [transit.player.player-methods :refer [listen
                                           monitor-silence
-                                          play-random-rest
                                           select-key
                                           select-mm
                                           select-instrument-for-player
                                           select-scale
                                           ]]
-   [transit.player.structures.base-structure :refer [get-melody-fn
-                                                     get-strength-fn]]
-   [transit.melody.melody-event :refer [create-melody-event]]
+   [transit.player.structures.base-structure :refer [get-cleanup-fn
+                                                     get-melody-fn
+                                                     get-strength-fn
+                                                     get-structr-id]]
+   [transit.melody.melody-event :refer [create-melody-event
+                                        get-structr-id-from-melody-event]]
    [transit.melody.rhythm :refer [select-random-rhythm]]
    [transit.util.random :refer [weighted-choice]]
    )
@@ -47,7 +49,6 @@
   (let [time (System/currentTimeMillis)]
       [
        (MethodInfo. listen 2 time)
-       (MethodInfo. play-random-rest 2 time)
        (MethodInfo. monitor-silence 1 time)
        (MethodInfo. select-key 1 time)
        (MethodInfo. select-mm 1 time)
@@ -98,6 +99,35 @@
     )
   )
 
+(defn cleanup-structr-id
+  "Find structure for structr-id in player
+   if found, call structr's cleanup-fn
+             update player with new struct which was returned from cleanup-fn
+             return updated player
+   if not found, return player as it is
+  "
+  [player structr-id]
+  (let [[structr-ndx  prev-structr] (first
+                                     (keep-indexed
+                                      #(if (= (get-structr-id %2) structr-id)
+                                         [%1 %2]
+                                         nil
+                                         )
+                                      (:structures player)
+                                      ))
+        cleanup-fn (if prev-structr (get-cleanup-fn prev-structr) nil)
+        ]
+
+    (if cleanup-fn
+        (assoc player
+               :structures
+               (assoc (:structures player)
+                      structr-ndx
+                      (cleanup-fn prev-structr)))
+      player
+      ))
+  )
+
 (defn get-struct-strength
   [structr]
   ((get-strength-fn structr) structr))
@@ -111,6 +141,7 @@
                        :instrument-info nil
                        :player-id player-id
                        :event-time nil
+                       :structr-id nil
                        )
   )
 
@@ -124,34 +155,41 @@
         melody-struct (if selected-struct-index
                         (get plyr-structs selected-struct-index)
                         nil)
+        [new-struct melody-event] (if melody-struct
+                                    ((get-melody-fn melody-struct)
+                                     ensemble
+                                     player
+                                     melody
+                                     player-id
+                                     melody-struct
+                                     (inc (:melody-event-id (last melody)))
+                                     )
+                                    [nil nil]
+                                    )
+        prev-structr-id (get-structr-id-from-melody-event
+                         (get melody (dec (count melody))))
+        ;; if this melody-event has a different structr-id than
+        ;; the prev melody-event, call cleanup-structr-id to update the player
+        ;; by calling the previous structr-id cleanup-fn
+        cleanup-player (if (or (not prev-structr-id)
+                               (and melody-event
+                                    (= (get-structr-id-from-melody-event
+                                        melody-event)
+                                       prev-structr-id))
+                               )
+                          player
+                          (cleanup-structr-id player prev-structr-id))
         ]
-    (println "all-weights: " all-weights)
-    (if melody-struct
-      (do
-        (let [[new-struct melody-event]
-              ((get-melody-fn melody-struct)
-               ensemble
-               player
-               melody
-               player-id
-               melody-struct
-               (inc (:melody-event-id (last melody)))
-               )]
-          (if melody-event
-            [(assoc player
-                    :structures
-                    (assoc plyr-structs selected-struct-index new-struct))
-             melody-event
-             ]
-            [player
-             (create-random-rest-melody-event
-              player-id
-              (inc (:melody-event-id (last melody))))
-             ]
-            )))
-      [player
-       (create-random-rest-melody-event player-id
-                                        (inc (:melody-event-id (last melody))))
+    (if melody-event
+      [(assoc cleanup-player
+              :structures
+              (assoc plyr-structs selected-struct-index new-struct))
+       melody-event
+       ]
+      [cleanup-player
+       (create-random-rest-melody-event
+        player-id
+        (inc (:melody-event-id (last melody))))
        ]
       )
     )

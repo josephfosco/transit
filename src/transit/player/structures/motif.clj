@@ -82,7 +82,7 @@
   )
 
 (defn create-motif
-  [& {:keys [struct-id
+  [& {:keys [structr-id
              internal-strength
              external-strength
              motif-events
@@ -93,7 +93,7 @@
        melody-events []
        complete? false
        }}]
-  (Motif. (create-base-structure :struct-id struct-id
+  (Motif. (create-base-structure :structr-id structr-id
                                  :internal-strength internal-strength
                                  :external-strength external-strength
                                  :melody-fn get-motif-melody-event)

@@ -19,7 +19,9 @@
    [transit.melody.rhythm :refer [select-random-rhythm]]
    [transit.player.structures.base-structure :refer [create-base-structure
                                                      get-internal-strength
+                                                     get-structr-id
                                                      reset-internal-strength-to-orig
+                                                     set-cleanup-fn
                                                      set-internal-strength
                                                      struct-updated]]
    )
@@ -41,27 +43,42 @@
                     last-gesture-melody-event
                     ])
 
+(defn cleanup-gesture-event
+  [gesture]
+  (if (= 0 (:next-gesture-event-ndx gesture))
+    gesture
+    (reset-internal-strength-to-orig gesture)
+    )
+  )
+
 (defn get-next-gesture-event
   [player next-melody-id gesture]
   (println "!!!!!! get-next-gesture-event  !!!!!")
   (println "player-id: " (:id player))
   (println next-melody-id gesture)
   (let [next-gesture-event ((:gesture-events gesture)
-                            (:next-gesture-event-ndx gesture))]
+                            (:next-gesture-event-ndx gesture))
+        next-gesture-event-ndx (mod (inc (:next-gesture-event-ndx gesture))
+                                    (count (:gesture-events gesture)))
+        ]
     (println "@@@@@@ PLAYING GESTURE EVENT @@@@@@@@")
     [
+     ;; after playing last note of gesture (next-gesture-event-ndx = 0)
+     ;; the cleanup-fn is set to nil (no cleanup needed)
+     ;; reset internal-strength to it's original value otherwise
      ;; increase internal-strength for each note of gesture played
-     ;; after playing last note of gesture reset internal-strength
-     ;; to it's original value
-     (assoc (if (< (:next-gesture-event-ndx gesture)
-                   (dec (count (:gesture-events gesture))))
-              (set-internal-strength gesture
-                                     (* 3 (get-internal-strength gesture)))
-              (reset-internal-strength-to-orig gesture)
+     (assoc (if (=  0 next-gesture-event-ndx)
+              (-> (reset-internal-strength-to-orig gesture)
+                  (set-cleanup-fn nil)
+
+                  )
+              (-> (set-internal-strength gesture
+                                         (* 2 (get-internal-strength gesture)))
+                  (set-cleanup-fn cleanup-gesture-event)
+               )
               )
             :next-gesture-event-ndx
-            (mod (inc (:next-gesture-event-ndx gesture))
-                 (count (:gesture-events gesture)))
+            next-gesture-event-ndx
             :last-gesture-melody-event
             next-melody-id
             )
@@ -72,6 +89,7 @@
                           :instrument-info (:instrument-info player)
                           :player-id (:id player)
                           :event-time nil
+                          :structr-id (get-structr-id gesture)
                           )
      ]
     )
@@ -126,11 +144,15 @@
       )
     (do
       (println "%%%%%%%%  Playing Existing Gesture  %%%%%%%%%%")
-      (let [new-gesture (if (not= next-melody-id
+      (let [new-gesture (if (and (not= 0 (:next-gesture-event-ndx gesture))
+                                 (not=
+                                  next-melody-id
                                   (inc (:last-gesture-melody-event gesture)))
+                                 )
                           ;; last melody event was not from gesture,
                           ;; start gesture from beginning
-                          (assoc gesture :next-gesture-event-ndx 0)
+                          (assoc (reset-internal-strength-to-orig gesture)
+                                   :next-gesture-event-ndx 0)
                           gesture
                           )]
         (get-next-gesture-event player next-melody-id new-gesture)
@@ -139,7 +161,7 @@
   )
 
 (defn create-gesture-struct
-  [& {:keys [struct-id
+  [& {:keys [structr-id
              internal-strength
              external-strength
              gesture-events
@@ -150,7 +172,7 @@
        melody-events []
        complete? false
        }}]
-  (Gesture. (create-base-structure :struct-id struct-id
+  (Gesture. (create-base-structure :structr-id structr-id
                                    :internal-strength internal-strength
                                    :external-strength external-strength
                                    :melody-fn get-gesture-melody-event)
