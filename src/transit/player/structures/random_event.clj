@@ -15,7 +15,6 @@
 
 (ns transit.player.structures.random-event
   (:require
-   [transit.melody.dur-info :refer [create-dur-info]]
    [transit.melody.melody-event :refer [create-melody-event]]
    [transit.melody.pitch :refer [select-random-pitch]]
    [transit.melody.rhythm :refer [select-random-rhythm]]

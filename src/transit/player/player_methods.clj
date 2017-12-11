@@ -23,8 +23,7 @@
    [transit.player.structures.motif :refer [create-motif]]
    [transit.melody.melody-event :refer [get-dur-millis-from-melody-event
                                         get-note-from-melody-event]]
-   [transit.melody.pitch :refer [select-random-key
-                                 select-random-pitch]]
+   [transit.melody.pitch :refer [select-random-key]]
    [transit.melody.rhythm :refer [select-random-rhythm]]
    [transit.melody.volume :refer [select-random-volume]]
    )

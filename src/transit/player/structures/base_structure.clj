@@ -60,21 +60,21 @@
   (:internal-strength (:base structr))
   )
 
-(defn struct-updated
+(defn structure-updated
   [structr]
   (assoc structr :base (assoc (:base structr) :updated-at (System/currentTimeMillis)))
   )
 
 (defn set-internal-strength
   [structr new-int-strength]
-  (struct-updated (assoc structr :base (assoc (:base structr)
+  (structure-updated (assoc structr :base (assoc (:base structr)
                                              :internal-strength
                                              (min 100 new-int-strength))))
   )
 
 (defn set-cleanup-fn
   [structr cleanup-fn]
-  (struct-updated (assoc structr :base (assoc (:base structr)
+  (structure-updated (assoc structr :base (assoc (:base structr)
                                              :cleanup-fn
                                              cleanup-fn)))
   )
@@ -82,7 +82,7 @@
 (defn reset-internal-strength-to-orig
   [structr]
   (let [base-structr (:base structr)]
-    (struct-updated (assoc structr
+    (structure-updated (assoc structr
                            :base
                            (assoc base-structr
                                   :internal-strength

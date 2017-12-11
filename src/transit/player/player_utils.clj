@@ -13,27 +13,15 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.melody.rhythm
+(ns transit.player.player-utils
   (:require
-   [transit.melody.dur-info]
-   [transit.util.random :refer [random-int]]
-   )
-  (:import
-   [transit.melody.dur_info DurInfo]
+   [transit.melody.pitch :refer [select-random-pitch]]
    )
   )
 
-(def min-dur 37)    ;; min duration 37 milliseconds
-(def max-dur 12000) ;; max duration 12 seconds
-
-(defn get-random-dur-millis
-  ([] (random-int min-dur max-dur))
-  ([min max] (random-int min max))
-  )
-
-(defn select-random-rhythm
-  ([]
-   (DurInfo. (get-random-dur-millis) nil))
-  ([min max]
-   (DurInfo. (get-random-dur-millis min max) nil))
+(defn select-random-pitch-for-player
+  [player]
+  (select-random-pitch (:range-lo (:instrument-info player))
+                       (:range-hi (:instrument-info player))
+                       )
   )
