@@ -15,6 +15,7 @@
 
 (ns transit.player.structures.gesture
   (:require
+   [transit.config.constants :refer [MIN-FREQ MAX-FREQ]]
    [transit.melody.melody-event :refer [create-melody-event]]
    [transit.melody.rhythm :refer [select-random-rhythm]]
    [transit.player.player-utils :refer [select-random-pitch-for-player]]
@@ -37,16 +38,16 @@
 
 (defrecord Gesture [base
                     gesture-events
-                    type  ;; FREE or METERED (METERED has mm and rhythmic values)
-                    complete? ;; is this a complete gesture
-                    next-gesture-event-ndx
-                    last-gesture-melody-event
+                    gesture-type ;; FREE or METERED (METERED has mm and rhythmic values)
+                    gesture-complete? ;; is this a complete gesture
+                    gesture-next-event-ndx
+                    gesture-last-melody-event
                     ])
 
 (defn cleanup-gesture-event
   ;; Called when playing a gesture is interrupted by another structure
   [gesture]
-  (if (= 0 (:next-gesture-event-ndx gesture))
+  (if (= 0 (:gesture-next-event-ndx gesture))
     gesture
     (reset-internal-strength-to-orig gesture)
     )
@@ -55,51 +56,67 @@
 (defn cleanup-partial-gesture-event
   ;; Called when building a gesture is interrupted by another structure
   [gesture]
-  (println "#############################################################3333")
-  (println "#############################################################3333")
   (println "############### CLEANING PARTIAL GESTURE ####################")
   (assoc (-> (set-cleanup-fn gesture nil)
              (reset-internal-strength-to-orig))
          :gesture-events []
-         :next-gesture-event-ndx nil
-         :last-gesture-melody-event 0
+         :gesture-next-event-ndx nil
+         :gesture-last-melody-event 0
          )
   )
 
 (defn create-new-gesture-event
   [player gesture]
   (println "CREATING GESTURE EVENT")
-  {:note (select-random-pitch-for-player player)
+  {:note (if (nil? (:gesture-nextevent-ndx gesture))
+           (select-random-pitch-for-player player)
+           (let [prior-note (:note
+                             ((:gesture-events gesture)
+                              (dec (:gesture-next-event-ndx gesture))))
+                 ]
+             (println "prior-note:" prior-note)
+             (select-random-pitch-for-player
+              player
+              (max (int (/ prior-note 2)) MIN-FREQ)
+              (min (* prior-note 2) MAX-FREQ)
+              ))
+           )
    :dur-info (select-random-rhythm GESTURE-MIN-MILLIS GESTURE-MAX-MILLIS)
    }
   )
 
 (defn get-next-gesture-event
-  " Returns an updated gesture and a melody-event"
+  " Returns an updated gesture and a melody-event based on the
+    :gesture-next-event-ndx from :gesture-events"
   [player next-melody-id gesture]
   (println "!!!!!! get-next-gesture-event  !!!!!")
   (println "player-id: " (:id player))
   (println next-melody-id gesture)
   (let [next-gesture-event ((:gesture-events gesture)
-                           (:next-gesture-event-ndx gesture))
-        next-gesture-event-ndx (if (:complete? gesture)
-                                 (mod (inc (:next-gesture-event-ndx gesture))
+                           (:gesture-next-event-ndx gesture))
+        next-gesture-event-ndx (if (:gesture-complete? gesture)
+                                 (mod (inc (:gesture-next-event-ndx gesture))
                                       (count (:gesture-events gesture)))
-                                 (inc (:next-gesture-event-ndx gesture))
+                                 (inc (:gesture-next-event-ndx gesture))
                                  )
         ]
     (println "@@@@@@ PLAYING GESTURE EVENT @@@@@@@@")
     [
-     ;; after playing last note of gesture (next-gesture-event-ndx = 0)
-     ;; the cleanup-fn is set to nil (no cleanup needed)
-     ;; reset internal-strength to it's original value otherwise
-     ;; increase internal-strength for each note of gesture played
+     ;; After playing last note of gesture (next-gesture-event-ndx = 0 and
+     ;;   :complete gesture) the cleanup-fn is set to nil (no cleanup needed)
+     ;;   reset internal-strength to it's original value otherwise
+     ;; When in the middle of a gesture, (next-gesture-event index not= 0 and
+     ;;   :complete gesture), set the cleanup-fn and
+     ;;   increase internal-strength for each note of gesture played
+     ;; When in the middle of creating a gesture (next-gesture-event-index
+     ;;   not= 0  and not :complete gesture) just increse internal-strength
+     ;;   for each note of gesture played, cleanup-fn is already set
      (assoc (cond (and (=  0 next-gesture-event-ndx)
-                       (:complete? gesture))
+                       (:gesture-complete? gesture))
                   (-> (reset-internal-strength-to-orig gesture)
                       (set-cleanup-fn nil)
                       )
-                  (:complete? gesture)
+                  (:gesture-complete? gesture)
                   (-> (set-internal-strength
                        gesture
                        (* 2 (get-internal-strength gesture)))
@@ -111,9 +128,9 @@
                        (* 2 (get-internal-strength gesture)))
                       )
               )
-            :next-gesture-event-ndx
+            :gesture-next-event-ndx
             next-gesture-event-ndx
-            :last-gesture-melody-event
+            :gesture-last-melody-event
             next-melody-id
             )
      (create-melody-event :melody-event-id next-melody-id
@@ -131,7 +148,7 @@
 
 (defn create-gesture-event
   " Returns an updated gesture with :gesture-events and possibly
-    :complete and :next-gesture-event-ndx updated
+    :complete and :gesture-next-event-ndx updated
 "
   [player gesture]
   (let [new-gesture-events-len (inc (count (:gesture-events gesture)))]
@@ -139,7 +156,7 @@
            :gesture-events (assoc (:gesture-events gesture)
                                   (count (:gesture-events gesture))
                                   (create-new-gesture-event player gesture))
-           :complete? (cond
+           :gesture-complete? (cond
                        (< new-gesture-events-len GESTURE-MIN-NOTES)
                        false
                        (= new-gesture-events-len GESTURE-MAX-NOTES)
@@ -149,8 +166,8 @@
                        :else
                        false
                        )
-           :next-gesture-event-ndx (if (:next-gesture-event-ndx gesture)
-                                     (:next-gesture-event-ndx gesture)
+           :gesture-next-event-ndx (if (:gesture-next-event-ndx gesture)
+                                     (:gesture-next-event-ndx gesture)
                                      0
                                      )
            ))
@@ -182,8 +199,8 @@
   (if-let [gestr (find-gesture melody)]
     (assoc (structure-updated gesture)
            :gesture-events gestr
-           :complete? true
-           :next-gesture-event-ndx 0)
+           :gesture-complete? true
+           :gesture-next-event-ndx 0)
     gesture
     )
   )
@@ -192,23 +209,23 @@
   "Returns a vector consisting of the gesture (possibly updated) and
    a melody event (or nil for no melody event found/created)"
   [ensemble player melody player-id gesture next-melody-id]
-  (if (:complete? gesture)
+  (if (:gesture-complete? gesture)
     (do
       (println "%%%%%%%%  Playing Existing Gesture  %%%%%%%%%%")
-      (let [new-gesture (if (and (not= 0 (:next-gesture-event-ndx gesture))
+      (let [new-gesture (if (and (not= 0 (:gesture-next-event-ndx gesture))
                                  (not=
                                   next-melody-id
-                                  (inc (:last-gesture-melody-event gesture)))
+                                  (inc (:gesture-last-melody-event gesture)))
                                  )
                           ;; last melody event was not from gesture,
                           ;; start gesture from beginning
                           (assoc (reset-internal-strength-to-orig gesture)
-                                 :next-gesture-event-ndx 0)
+                                 :gesture-next-event-ndx 0)
                           gesture
                           )]
         (get-next-gesture-event player next-melody-id new-gesture)
         ))
-    ;; I there are gesture events, but the gesture is not complete,
+    ;; If there are gesture events, but the gesture is not complete,
     ;; add a new event.
     ;; If there are no geture events, attempt to build a gwsture from
     ;; prior melody events.
@@ -222,7 +239,7 @@
                                 (create-gesture-event player gesture))
         )
       (let [new-gesture (complete-gesture-struct gesture melody)]
-        (if (:complete? new-gesture)
+        (if (:gesture-complete? new-gesture)
           (do
             (println "$$$$$$ found-gesture " (:gesture-events new-gesture))
             (println "&&& new-gesture: " new-gesture)
@@ -246,21 +263,21 @@
              internal-strength
              external-strength
              gesture-events
-             type
-             complete?] :or
+             gesture-type
+             gesture-complete?] :or
       {internal-strength 0
        external-strength 0
        gesture-events []
-       complete? false
+       gesture-complete? false
        }}]
   (Gesture. (create-base-structure :structr-id structr-id
                                    :internal-strength internal-strength
                                    :external-strength external-strength
                                    :melody-fn get-gesture-melody-event)
             gesture-events
-            type
-            complete?
-            nil  ;; next-gesture-event-ndx
-            0  ;; last-gesture-melody-event
+            gesture-type
+            gesture-complete?
+            nil  ;; gesture-next-event-ndx
+            0  ;; gesture-last-melody-event
             )
   )

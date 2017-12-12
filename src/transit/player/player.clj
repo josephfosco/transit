@@ -119,7 +119,6 @@
                                       ))
         cleanup-fn (if prev-structr (get-cleanup-fn prev-structr) nil)
         ]
-    (println "structr-ndx:" structr-ndx "cleanup-fn:" cleanup-fn)
     (if (not cleanup-fn) (println prev-structr))
     (if cleanup-fn
         (assoc player
@@ -186,7 +185,9 @@
     (if melody-event
       [(assoc cleanup-player
               :structures
-              (assoc plyr-structs selected-struct-index new-struct))
+              (assoc (:structures cleanup-player)
+                     selected-struct-index
+                     new-struct))
        melody-event
        ]
       [cleanup-player

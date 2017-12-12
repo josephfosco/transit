@@ -20,8 +20,14 @@
   )
 
 (defn select-random-pitch-for-player
-  [player]
-  (select-random-pitch (:range-lo (:instrument-info player))
-                       (:range-hi (:instrument-info player))
-                       )
+  ([player]
+   (select-random-pitch (:range-lo (:instrument-info player))
+                        (:range-hi (:instrument-info player))
+                        )
+   )
+  ([player lo hi]
+   (select-random-pitch (:range-lo (:instrument-info player))
+                        (:range-hi (:instrument-info player))
+                        )
+   )
   )

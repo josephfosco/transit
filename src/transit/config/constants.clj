@@ -15,7 +15,7 @@
 
 (ns transit.config.constants
   (:require
-   [overtone.live :refer [MIDI-RANGE]]
+   [overtone.live :refer [midi->hz MIDI-RANGE]]
    )
   )
 
@@ -23,3 +23,6 @@
 
 (def FREE 0)
 (def METERED 1)
+
+(def MIN-FREQ (midi->hz (first MIDI-RANGE)))
+(def MAX-FREQ (midi->hz (last MIDI-RANGE)))
