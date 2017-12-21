@@ -17,7 +17,7 @@
   (:require
    [transit.player.player :use [create-player]]
    [transit.player.structures.motif :use [create-motif]]
-   [transit.player.structures.random-event :use [create-random-event]]
+   [transit.player.structures.random-event :use [create-random-structr]]
    )
   (:import
    [transit.player.structures.motif Motif]
@@ -84,9 +84,9 @@
 
 (deftest test-remove-structure-type
   (testing "removes all structures of a type from player"
-    (let [struct1 (create-random-event)
+    (let [struct1 (create-random-structr)
           struct2 (create-motif)
-          struct3 (create-random-event)
+          struct3 (create-random-structr)
           struct4 (create-motif)
           player (assoc (create-player :id 1)
                         :structures [struct1 struct2 struct3 struct4]
@@ -98,9 +98,9 @@
     )
 
   (testing "removes all structures in a list from player"
-    (let [struct1 (create-random-event)
+    (let [struct1 (create-random-structr)
           struct2 (create-motif)
-          struct3 (create-random-event)
+          struct3 (create-random-structr)
           struct4 (create-motif)
           player (assoc (create-player :id 1)
                         :structures [struct1 struct2 struct3 struct4]

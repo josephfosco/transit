@@ -29,9 +29,9 @@
 
 (defn get-base-strength
   [structr]
-  (let [base-struct (:base structr)]
-    (min 100 (+ (:internal-strength base-struct)
-                (:external-strength base-struct)))
+  (let [base-structr (:base structr)]
+    (min 100 (+ (:internal-strength base-structr)
+                (:external-strength base-structr)))
     )
   )
 

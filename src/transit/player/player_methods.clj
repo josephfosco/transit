@@ -18,8 +18,8 @@
    [transit.config.constants :refer [FREE METERED]]
    [transit.instr.instrument :refer [select-instrument]]
    [transit.player.structures.base-structure :refer [set-structr-id]]
-   [transit.player.structures.gesture :refer [create-gesture-struct]]
-   [transit.player.structures.random-event :refer [create-random-struct]]
+   [transit.player.structures.gesture :refer [create-gesture-structr]]
+   [transit.player.structures.random-event :refer [create-random-structr]]
    [transit.player.structures.motif :refer [create-motif]]
    [transit.melody.melody-event :refer [get-dur-millis-from-melody-event
                                         get-note-from-melody-event]]
@@ -112,7 +112,7 @@
   (println "******  play-random-rest  ******" player-id)
   [ensemble
    (add-structure player
-                  (create-random-struct :internal-strength 1 :rest? true))
+                  (create-random-structr :internal-strength 1 :rest? true))
    melody
    player-id
    {:status OK}
@@ -124,7 +124,7 @@
   (println "******  play-random  ******" player-id)
   [ensemble
    (add-structure player
-                  (create-random-struct :internal-strength 1))
+                  (create-random-structr :internal-strength 1))
    melody
    player-id
    {:status OK}
@@ -237,8 +237,8 @@
   [[ensemble player melody player-id rtn-map]]
   (println "******  build-gesture  ******" player-id)
   [ensemble
-   (add-structure player (create-gesture-struct :internal-strength 1
-                                                :type FREE)
+   (add-structure player (create-gesture-structr :internal-strength 1
+                                                 :type FREE)
                         )
    melody
    player-id

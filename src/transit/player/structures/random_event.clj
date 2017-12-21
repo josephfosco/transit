@@ -62,7 +62,7 @@
     )
   )
 
-(defn create-random-struct
+(defn create-random-structr
   [& {:keys [structr-id
              internal-strength
              external-strength

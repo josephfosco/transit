@@ -87,6 +87,26 @@ require storing mm for each note)
 
 Types of Local Structures
 -------------------------
+random event
+gesture
+melody
+arpeggio
+ostinato
+
+
+
+Variations - Slip
+-----------------
+transpose
+retrograde
+invert
+combinations of transpose retrograde invert
+reduce rhythmic values
+increase rhythmic values
+
+
+
+
 
 - arpeggio (nymber of notes)
 - stepwise motion up/down

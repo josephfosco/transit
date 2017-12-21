@@ -24,5 +24,7 @@
 (def FREE 0)
 (def METERED 1)
 
+(def MIN-NOTE (first MIDI-RANGE))
+(def MAX-NOTE (last MIDI-RANGE))
 (def MIN-FREQ (midi->hz (first MIDI-RANGE)))
 (def MAX-FREQ (midi->hz (last MIDI-RANGE)))

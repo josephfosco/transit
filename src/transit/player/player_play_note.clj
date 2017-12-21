@@ -201,6 +201,7 @@
 
 (defn play-next-note
   [player-id sched-time]
+  (println)
   (println "start -" player-id)
   (let [event-time (+ sched-time METHOD-PROCESS-MILLIS)
         ensemble (get-ensemble)

@@ -1,0 +1,4 @@
+Make gesture restrict range from GESTURE-MAX-SKIP
+Write a function to continually run and check that all players are playing
+Set up scales based on ratios
+Be able to use other distributions besides linear or weighted-choice

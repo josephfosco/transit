@@ -107,8 +107,6 @@
    if not found, return player as it is
   "
   [player structr-id]
-  (println "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-  (println "cleanup-struct-id - structr-id:" structr-id)
   (let [[structr-ndx  prev-structr] (first
                                      (keep-indexed
                                       #(if (= (get-structr-id %2) structr-id)

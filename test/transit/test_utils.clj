@@ -13,12 +13,12 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.core-test
-  (:require [clojure.test :refer :all]
-            [transit.core :refer :all]
-            [transit.player.player-play-note-test :refer :all]
-            [transit.player.player-methods-test :refer :all]
-            [transit.player.structures.gesture-test :refer :all]
-            [transit.util.random-test :refer :all]
-            [transit.util.util-test :refer :all]
-            ))
+(ns transit.test-utils)
+
+(defmacro with-private-fns
+  [[ns fns] & tests]
+  "Refers private fns from ns and runs tests in context"
+  `(let ~(reduce #(conj %1 %2 `(ns-resolve '~ns '~%2)) [] fns)
+     ~@tests
+     )
+  )
