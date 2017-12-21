@@ -24,7 +24,8 @@
 (def FREE 0)
 (def METERED 1)
 
-(def MIN-NOTE (first MIDI-RANGE))
+;; midi notes below 16 are less than 20 hz
+(def MIN-NOTE 16)
 (def MAX-NOTE (last MIDI-RANGE))
-(def MIN-FREQ (midi->hz (first MIDI-RANGE)))
-(def MAX-FREQ (midi->hz (last MIDI-RANGE)))
+(def MIN-FREQ (midi->hz MIN-NOTE))
+(def MAX-FREQ (midi->hz MAX-NOTE))

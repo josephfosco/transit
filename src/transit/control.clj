@@ -75,7 +75,6 @@
     (set-setting :volume-adjust (min (/ 32 number-of-players) 1))
     (init-transit init-players init-melodies)
     (start-playing)
-
     )
   )
 
