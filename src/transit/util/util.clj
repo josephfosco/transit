@@ -13,7 +13,14 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns transit.util.util)
+(ns transit.util.util
+  (:require
+   [clojure.core.async :refer [chan pub]]
+   )
+  )
+
+(def status-in-channel (chan))
+(def status-pub (pub status-in-channel :status-msg))
 
 (defn remove-element-from-vector
   "Returns a vector with element at ndx removed

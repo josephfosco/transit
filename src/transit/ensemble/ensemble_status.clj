@@ -14,6 +14,10 @@
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns transit.ensemble.ensemble-status
+  (:require
+   [clojure.core.async :refer [<! chan go-loop sub]]
+   [transit.util.util :refer [status-pub]]
+   )
   )
 
 (defrecord EnsembleStatus [])
@@ -31,7 +35,20 @@
              num-rhythmic
              ]
       }]
-  (EnsembleStatus. id
-           (get-initial-player-methods)
-           )
+  (EnsembleStatus.
+   )
+  )
+
+(defn start-status
+  []
+  (def status-out-channel (chan))
+  (sub status-pub :melody-event status-out-channel)
+  (go-loop [full-msg (<! status-out-channel)]
+    (when full-msg
+      (let [{:keys [msg]} full-msg]
+        (println  "#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#")
+        (println msg)
+        (recur (<! status-out-channel))
+        ))
+    )
   )

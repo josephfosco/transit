@@ -18,12 +18,15 @@
    [overtone.live :refer [now]]
    [transit.config.config :refer [get-setting set-setting]]
    [transit.ensemble.ensemble :refer [init-ensemble]]
+   [transit.ensemble.ensemble-status :refer [start-status]]
    [transit.player.player :refer [create-player]]
    [transit.player.player-play-note :refer [play-next-note]]
    [transit.melody.melody-event :refer [create-melody-event]]
    [transit.util.print :refer [print-banner]]
    )
   )
+
+(defonce transit-started (atom false))
 
 (defn init-transit
   "Initialize transit to play. Use only once (first time)
@@ -74,6 +77,10 @@
         ]
     (set-setting :volume-adjust (min (/ 32 number-of-players) 1))
     (init-transit init-players init-melodies)
+    (when (not @transit-started)
+      (start-status)
+      (reset! transit-started true)
+      )
     (start-playing)
     )
   )

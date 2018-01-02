@@ -15,6 +15,7 @@
 
 (ns transit.player.player-play-note
   (:require
+   [clojure.core.async :refer [>!!]]
    [overtone.live :refer [apply-at ctl midi->hz]]
    [transit.instr.instrumentinfo :refer [get-release-millis-from-instrument-info
                                          get-instrument-from-instrument-info]]
@@ -39,7 +40,7 @@
    [transit.player.player :refer [get-next-melody-event]]
    [transit.player.player-methods :refer [NEW-MELODY NEXT-METHOD]]
    [transit.util.random :refer [weighted-choice]]
-   [transit.util.util :refer [remove-element-from-vector]]
+   [transit.util.util :refer [remove-element-from-vector status-in-channel]]
    )
   )
 
@@ -225,6 +226,7 @@
     (check-prior-event-note-off (last melody) upd-melody-event)
     (sched-next-note upd-melody-event)
     (update-player-and-melody upd-player upd-melody player-id)
+    (>!! status-in-channel {:status-msg :melody-event :msg upd-melody-event})
     (println "end -" player-id " - "(- (System/currentTimeMillis) event-time) "melody-event: " (:melody-event-id upd-melody-event))
     )
  )
