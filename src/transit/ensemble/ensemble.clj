@@ -23,6 +23,7 @@
   )
 
 (def ^:private ensemble (atom nil))
+(def ^:private player-msgs (atom nil))
 
 (defn get-ensemble
   []
@@ -43,7 +44,6 @@
   (assoc ens
          :players (assoc (:players ens) player-id player)
          :melodies (assoc (:melodies ens) player-id melody)
-         :msgs (:msgs ens)
          )
   )
 
@@ -52,35 +52,35 @@
   (swap! ensemble player-and-melody-update player melody player-id)
   )
 
-(defn reset-player-id-msgs
-  [ens player-id]
-  (assoc ens
-         :players (:players ens)
-         :melodies (:melodies ens)
-         :msgs (assoc (:melodies ens) player-id '())
-         )
+(defn reset-msgs-for-player-id
+  [msgs player-id]
+  (assoc msgs player-id '())
   )
 
 (defn try-to-clear-msgs-for-player-id
   [player-id]
-  (let [ens @ensemble]
-    (if (compare-and-set! ensemble
-                          ens
-                          (reset-player-id-msgs ens player-id))
-      ens
+  (let [msgs @player-msgs]
+    (if (compare-and-set! player-msgs
+                          msgs
+                          (reset-msgs-for-player-id msgs player-id))
+      msgs
       (do
         (log/warn "*** Couldn't clear msgs for player " player-id " - Retrying .... ***")
         nil
         )
-      )
-    )
+      ))
   )
 
 (defn get-ensemble-clear-msg-for-player-id
   [player-id]
-  (first
-   (remove nil?
-           (repeatedly (partial try-to-clear-msgs-for-player-id player-id))))
+  (let [cur-msgs
+        (first
+         (remove nil?
+                 (repeatedly (partial
+                              try-to-clear-msgs-for-player-id
+                              player-id))))]
+    [@ensemble (cur-msgs player-id)]
+    )
   )
 
 (defn init-ensemble
@@ -91,10 +91,9 @@
     (into [] init-players)
     :melodies
     (into [] init-melodies)
-    :msgs
-    (into [] init-msgs)
     }
    )
+  (reset! player-msgs (into [] init-msgs))
   @ensemble
   )
 

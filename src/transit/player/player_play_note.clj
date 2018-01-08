@@ -212,7 +212,7 @@
   (println)
   (println "start -" player-id)
   (let [event-time (+ sched-time METHOD-PROCESS-MILLIS STRUCTURE-PROCESS-MILLIS)
-        ensemble (get-ensemble-clear-msg-for-player-id player-id)
+        [ensemble player-msgs] (get-ensemble-clear-msg-for-player-id player-id)
         player (get-player ensemble player-id)
         melody (get-melody ensemble player-id)
         method-context [ensemble player melody player-id {:status NEXT-METHOD}]
