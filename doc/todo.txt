@@ -1,4 +1,25 @@
-Make gesture restrict range from GESTURE-MAX-SKIP
 Write a function to continually run and check that all players are playing
 Set up scales based on ratios
 Be able to use other distributions besides linear or weighted-choice
+
+-------------------------------------------------------------
+
+ASYNC PROCESSING (messages)
+
+Phase 1
+When subscribing to a message player must not schedule new notes.
+
+1. can-schedule is set to false in player so a new note is not scheduled.
+2. A melody event with nil dur-info is placed as the next melody event
+3. when a message arrives, it is placed on the pending message list for
+the player and the player is scheduled to play the next note immediately.
+4. The pending message(s) is/are processed before running player-methods
+
+Phase 2
+When subscribing to messages player can continue to play,
+but new messages will not be processed until they start looking for
+their next note.
+
+Phase 3
+When subscribing to messages player can continue to play, and messages
+can interrupt their playing.

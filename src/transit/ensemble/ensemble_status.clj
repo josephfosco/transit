@@ -1,4 +1,4 @@
-;    Copyright (C) 2017  Joseph Fosco. All Rights Reserved
+;    Copyright (C) 2017-2018  Joseph Fosco. All Rights Reserved
 ;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 (ns transit.ensemble.ensemble-status
   (:require
    [clojure.core.async :refer [<! chan go-loop sub]]
-   [transit.util.util :refer [status-pub]]
+   [transit.util.util :refer [events-pub]]
    )
   )
 
@@ -42,12 +42,12 @@
 (defn start-status
   []
   (def status-out-channel (chan))
-  (sub status-pub :melody-event status-out-channel)
+  (sub events-pub :melody-event status-out-channel)
   (go-loop [full-msg (<! status-out-channel)]
     (when full-msg
       (let [{:keys [msg]} full-msg]
-        (println  "#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#")
-        (println msg)
+        ;; (println  "#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#")
+        ;; (println msg)
         (recur (<! status-out-channel))
         ))
     )

@@ -56,7 +56,6 @@
 (defn cleanup-partial-gesture-event
   ;; Called when building a gesture is interrupted by another structure
   [gesture]
-  (println "############### CLEANING PARTIAL GESTURE ####################")
   (assoc (-> (set-cleanup-fn gesture nil)
              (reset-internal-strength-to-orig))
          :gesture-events []
@@ -89,8 +88,6 @@
     :gesture-next-event-ndx from :gesture-events"
   [player next-melody-id gesture]
   (println "!!!!!! get-next-gesture-event  !!!!!")
-  (println "player-id: " (:id player))
-  (println next-melody-id gesture)
   (let [next-gesture-event ((:gesture-events gesture)
                            (:gesture-next-event-ndx gesture))
         next-gesture-event-ndx (if (:gesture-complete? gesture)
@@ -189,7 +186,6 @@
   [full-possible-gesture]
   ;; first see if there is a possible gesture of an acceptable length
   ;; then make certauin the jumps in the gesture are within range
-  (println "####### VALIDATE-GESTURE ####")
   (let [poss-gesture
         (cond (<= GESTURE-MIN-NOTES
                   (count full-possible-gesture)
@@ -274,11 +270,9 @@
           )
         :else
         (let [new-gesture (complete-gesture-structr gesture melody)]
-          (println "new-gesture: " new-gesture)
           (if (:gesture-complete? new-gesture)
             (do
-              (println "$$$$$$ found-gesture " (:gesture-events new-gesture))
-              (println "&&& new-gesture: " new-gesture)
+              (println "$$$$$$ found-gesture ")
               (get-next-gesture-event player next-melody-id new-gesture)
               )
             (do

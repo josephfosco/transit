@@ -1,4 +1,4 @@
-;    Copyright (C) 2017  Joseph Fosco. All Rights Reserved
+;    Copyright (C) 2017-2018  Joseph Fosco. All Rights Reserved
 ;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
    [transit.config.config :refer [get-setting]]
    [transit.melody.melody-event :refer [print-melody-event]]
    [transit.player.player :refer [print-player]]
+   [transit.util.log :as log]
    )
   )
 
@@ -42,22 +43,56 @@
   (assoc ens
          :players (assoc (:players ens) player-id player)
          :melodies (assoc (:melodies ens) player-id melody)
+         :msgs (:msgs ens)
          )
   )
 
 (defn update-player-and-melody
   [player melody player-id]
   (swap! ensemble player-and-melody-update player melody player-id)
- )
+  )
+
+(defn reset-player-id-msgs
+  [ens player-id]
+  (assoc ens
+         :players (:players ens)
+         :melodies (:melodies ens)
+         :msgs (assoc (:melodies ens) player-id '())
+         )
+  )
+
+(defn try-to-clear-msgs-for-player-id
+  [player-id]
+  (let [ens @ensemble]
+    (if (compare-and-set! ensemble
+                          ens
+                          (reset-player-id-msgs ens player-id))
+      ens
+      (do
+        (log/warn "*** Couldn't clear msgs for player " player-id " - Retrying .... ***")
+        nil
+        )
+      )
+    )
+  )
+
+(defn get-ensemble-clear-msg-for-player-id
+  [player-id]
+  (first
+   (remove nil?
+           (repeatedly (partial try-to-clear-msgs-for-player-id player-id))))
+  )
 
 (defn init-ensemble
-  [init-players init-melodies]
+  [init-players init-melodies init-msgs]
   (reset!
    ensemble
    {:players
     (into [] init-players)
     :melodies
     (into [] init-melodies)
+    :msgs
+    (into [] init-msgs)
     }
    )
   @ensemble

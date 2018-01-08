@@ -1,4 +1,4 @@
-;    Copyright (C) 2017  Joseph Fosco. All Rights Reserved
+;    Copyright (C) 2017-2018  Joseph Fosco. All Rights Reserved
 ;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -15,8 +15,36 @@
 
 (ns transit.player.player-utils
   (:require
+   [transit.melody.melody-event :refer [create-melody-event]]
    [transit.melody.pitch :refer [select-random-pitch]]
+   [transit.melody.rhythm :refer [select-random-rhythm]]
    )
+  )
+
+(defn create-random-rest-melody-event
+  [player-id event-id]
+  (create-melody-event :melody-event-id event-id
+                       :note nil
+                       :dur-info (select-random-rhythm)
+                       :volume nil
+                       :instrument-info nil
+                       :player-id player-id
+                       :event-time nil
+                       :structr-id nil
+                       )
+  )
+
+(defn create-nodur-rest-melody-event
+  [player-id event-id]
+  (create-melody-event :melody-event-id event-id
+                       :note nil
+                       :dur-info nil
+                       :volume nil
+                       :instrument-info nil
+                       :player-id player-id
+                       :event-time nil
+                       :structr-id nil
+                       )
   )
 
 (defn select-random-pitch-for-player

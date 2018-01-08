@@ -1,4 +1,4 @@
-;    Copyright (C) 2017  Joseph Fosco. All Rights Reserved
+;    Copyright (C) 2017-2018  Joseph Fosco. All Rights Reserved
 ;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
    [transit.instr.sc-instrument :refer [stop-instrument]]
    [transit.config.config :refer [get-setting]]
    [transit.config.constants :refer [SAVED-MELODY-LEN]]
-   [transit.ensemble.ensemble :refer [get-ensemble
+   [transit.ensemble.ensemble :refer [get-ensemble-clear-msg-for-player-id
                                       get-melody
                                       get-player
                                       update-player-and-melody]]
@@ -40,11 +40,12 @@
    [transit.player.player :refer [get-next-melody-event]]
    [transit.player.player-methods :refer [NEW-MELODY NEXT-METHOD]]
    [transit.util.random :refer [weighted-choice]]
-   [transit.util.util :refer [remove-element-from-vector status-in-channel]]
+   [transit.util.util :refer [remove-element-from-vector events-in-channel]]
    )
   )
 
 (def METHOD-PROCESS-MILLIS 12)
+(def STRUCTURE-PROCESS-MILLIS 8)
 
 (defn get-player-method
   [player ndx]
@@ -114,9 +115,14 @@
   )
 
 (defn stop-running-methods?
-  [event-time [ens player melody player-id rtn-map]]
+  ;; if there are no more methods to run or
+  ;;    it is at or past the time to stop running methods or
+  ;;    can-schedule is false
+  ;; return true (stop running-methods)
+  ;; else return false (continue to run methods)
+  [stop-time [ens player melody player-id rtn-map]]
   (or (= 0 (count (:methods player)))
-      (>= (System/currentTimeMillis) (- event-time 10))
+      (>= (System/currentTimeMillis) stop-time)
       )
   )
 
@@ -146,7 +152,8 @@
   (let [next-time (- (+ (get-event-time-from-melody-event melody-event)
                         (get-dur-millis-from-melody-event melody-event)
                         )
-                     METHOD-PROCESS-MILLIS)]
+                     METHOD-PROCESS-MILLIS
+                     STRUCTURE-PROCESS-MILLIS)]
     (apply-at next-time
               play-next-note
               [(get-player-id-from-melody-event melody-event) next-time]
@@ -204,13 +211,14 @@
   [player-id sched-time]
   (println)
   (println "start -" player-id)
-  (let [event-time (+ sched-time METHOD-PROCESS-MILLIS)
-        ensemble (get-ensemble)
+  (let [event-time (+ sched-time METHOD-PROCESS-MILLIS STRUCTURE-PROCESS-MILLIS)
+        ensemble (get-ensemble-clear-msg-for-player-id player-id)
         player (get-player ensemble player-id)
         melody (get-melody ensemble player-id)
         method-context [ensemble player melody player-id {:status NEXT-METHOD}]
         [_ new-player melody player-id rtn-map]
-        (first (filter (partial stop-running-methods? event-time)
+        (first (filter (partial stop-running-methods?
+                                (- event-time STRUCTURE-PROCESS-MILLIS))
                        (iterate run-player-method method-context)))
         [upd-player next-melody-event] (get-next-melody-event
                                         ensemble
@@ -224,9 +232,9 @@
 
         ]
     (check-prior-event-note-off (last melody) upd-melody-event)
-    (sched-next-note upd-melody-event)
     (update-player-and-melody upd-player upd-melody player-id)
-    (>!! status-in-channel {:status-msg :melody-event :msg upd-melody-event})
+    (sched-next-note upd-melody-event)
+    (>!! events-in-channel {:event :melody-event :msg upd-melody-event})
     (println "end -" player-id " - "(- (System/currentTimeMillis) event-time) "melody-event: " (:melody-event-id upd-melody-event))
     )
  )

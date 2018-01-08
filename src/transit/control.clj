@@ -1,4 +1,4 @@
-;    Copyright (C) 2017  Joseph Fosco. All Rights Reserved
+;    Copyright (C) 2017-2018  Joseph Fosco. All Rights Reserved
 ;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
    [transit.player.player :refer [create-player]]
    [transit.player.player-play-note :refer [play-next-note]]
    [transit.melody.melody-event :refer [create-melody-event]]
+   [transit.util.log :as log]
    [transit.util.print :refer [print-banner]]
    )
   )
@@ -32,9 +33,12 @@
   "Initialize transit to play. Use only once (first time)
 
    args -
-   players - map of all initial players"
-  [players melodies]
-  (init-ensemble players melodies)
+   players - list of all initial players
+   melodies - list of all initial melodies (1 for each player)
+   msgs -  an empty list to be used for msgs sent to the player
+  "
+  [players melodies msgs]
+  (init-ensemble players melodies msgs)
   )
 
 (defn new-player
@@ -64,7 +68,7 @@
 (defn- start-playing
   "calls play-note the first time for every player in ensemble"
   []
-  (println "********** start-playing ****************")
+  (log/warn "********** start-playing ****************")
   (dotimes [id (get-setting :num-players)] (play-first-note id))
   )
 
@@ -74,9 +78,10 @@
   (let [number-of-players (get-setting :num-players)
         init-players (map new-player (range number-of-players))
         init-melodies (map init-melody (range number-of-players))
+        init-msgs (for [x (range number-of-players)] '())
         ]
     (set-setting :volume-adjust (min (/ 32 number-of-players) 1))
-    (init-transit init-players init-melodies)
+    (init-transit init-players init-melodies init-msgs)
     (when (not @transit-started)
       (start-status)
       (reset! transit-started true)

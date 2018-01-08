@@ -1,4 +1,4 @@
-;    Copyright (C) 2017  Joseph Fosco. All Rights Reserved
+;    Copyright (C) 2017-2018  Joseph Fosco. All Rights Reserved
 ;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -16,11 +16,12 @@
 (ns transit.util.util
   (:require
    [clojure.core.async :refer [chan pub]]
+   [transit.config.config :refer [get-setting]]
    )
   )
 
-(def status-in-channel (chan))
-(def status-pub (pub status-in-channel :status-msg))
+(defonce events-in-channel (chan (* 2 (get-setting :num-players))))
+(defonce events-pub (pub events-in-channel :event))
 
 (defn remove-element-from-vector
   "Returns a vector with element at ndx removed

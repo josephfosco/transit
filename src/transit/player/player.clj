@@ -1,4 +1,4 @@
-;    Copyright (C) 2017  Joseph Fosco. All Rights Reserved
+;    Copyright (C) 2017-2018  Joseph Fosco. All Rights Reserved
 ;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -22,13 +22,12 @@
                                           select-instrument-for-player
                                           select-scale
                                           ]]
+   [transit.player.player-utils :refer [create-random-rest-melody-event]]
    [transit.player.structures.base-structure :refer [get-cleanup-fn
                                                      get-melody-fn
                                                      get-strength-fn
                                                      get-structr-id]]
-   [transit.melody.melody-event :refer [create-melody-event
-                                        get-structr-id-from-melody-event]]
-   [transit.melody.rhythm :refer [select-random-rhythm]]
+   [transit.melody.melody-event :refer [get-structr-id-from-melody-event]]
    [transit.util.random :refer [weighted-choice]]
    )
   (:import transit.player.player_methods.MethodInfo)
@@ -42,7 +41,9 @@
                    methods
                    sampled-melodies
                    structures
-                   next-struct-num])
+                   next-struct-num
+                   can-schedule? ;; is not waiting for a notification
+                   ])
 
 (defn get-initial-player-methods
   []
@@ -69,6 +70,7 @@
            nil  ;; sampled-melodies
            []   ;; structures
            0    ;; next-struct-num
+           true ;; can-schedule?
            )
   )
 
@@ -117,7 +119,6 @@
                                       ))
         cleanup-fn (if prev-structr (get-cleanup-fn prev-structr) nil)
         ]
-    (if (not cleanup-fn) (println prev-structr))
     (if cleanup-fn
         (assoc player
                :structures
@@ -132,20 +133,8 @@
   [structr]
   ((get-strength-fn structr) structr))
 
-(defn create-random-rest-melody-event
-  [player-id event-id]
-  (create-melody-event :melody-event-id event-id
-                       :note nil
-                       :dur-info (select-random-rhythm)
-                       :volume nil
-                       :instrument-info nil
-                       :player-id player-id
-                       :event-time nil
-                       :structr-id nil
-                       )
-  )
-
 (defn get-next-melody-event
+  " Returns a melody-event and an updated player"
   [ensemble player melody player-id]
   (let [plyr-structs (:structures player)
         all-weights (mapv get-struct-strength plyr-structs)
