@@ -16,9 +16,15 @@
 (ns transit.ensemble.ensemble-status
   (:require
    [clojure.core.async :refer [<! chan go-loop sub]]
-   [transit.util.util :refer [events-pub]]
+   [transit.config.config :refer [get-setting]]
+   [transit.melody.melody-event :refer [get-dur-millis-from-melody-event
+                                        get-play-time-from-melody-event
+                                        ]]
+   [transit.util.util :refer [msgs-pub]]
    )
   )
+
+(def ^:private note-times (atom '()))
 
 (defrecord EnsembleStatus [])
 
@@ -39,15 +45,29 @@
    )
   )
 
+(defn add-event-to-note-times
+  [cur-note-times event]
+  (conj cur-note-times event)
+  )
+
+(defn new-melody-event
+  [melody-event]
+  (swap! note-times
+         add-event-to-note-times
+         (list (get-play-time-from-melody-event melody-event)
+               (get-dur-millis-from-melody-event melody-event)
+               )
+         )
+  )
+
 (defn start-status
   []
-  (def status-out-channel (chan))
-  (sub events-pub :melody-event status-out-channel)
+  (def status-out-channel (chan (* 2 (get-setting :num-players))))
+  (sub msgs-pub :melody-event status-out-channel)
   (go-loop [full-msg (<! status-out-channel)]
     (when full-msg
-      (let [{:keys [msg]} full-msg]
-        ;; (println  "#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#%#")
-        ;; (println msg)
+      (let [{:keys [data]} full-msg]
+        (new-melody-event data)
         (recur (<! status-out-channel))
         ))
     )

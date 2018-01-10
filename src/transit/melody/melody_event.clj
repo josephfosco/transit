@@ -1,4 +1,4 @@
-;    Copyright (C) 2017  Joseph Fosco. All Rights Reserved
+;    Copyright (C) 2017-2018  Joseph Fosco. All Rights Reserved
 ;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -113,6 +113,11 @@
 (defn get-event-time-from-melody-event
  [melody-event]
  (:event-time melody-event)
+ )
+
+(defn get-play-time-from-melody-event
+ [melody-event]
+ (:play-time melody-event)
  )
 
 (defn get-instrument-info-from-melody-event

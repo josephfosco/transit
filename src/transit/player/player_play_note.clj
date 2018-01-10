@@ -40,7 +40,7 @@
    [transit.player.player :refer [get-next-melody-event]]
    [transit.player.player-methods :refer [NEW-MELODY NEXT-METHOD]]
    [transit.util.random :refer [weighted-choice]]
-   [transit.util.util :refer [remove-element-from-vector events-in-channel]]
+   [transit.util.util :refer [remove-element-from-vector msgs-in-channel]]
    )
   )
 
@@ -202,7 +202,6 @@
                            )))]
     (do
       (println player)
-      ;; (println melody-event)
       (throw (Throwable. "Invalid Structure"))
       ))
 )
@@ -234,7 +233,7 @@
     (check-prior-event-note-off (last melody) upd-melody-event)
     (update-player-and-melody upd-player upd-melody player-id)
     (sched-next-note upd-melody-event)
-    (>!! events-in-channel {:event :melody-event :msg upd-melody-event})
+    (>!! msgs-in-channel {:msg :melody-event :data upd-melody-event})
     (println "end -" player-id " - "(- (System/currentTimeMillis) event-time) "melody-event: " (:melody-event-id upd-melody-event))
     )
  )

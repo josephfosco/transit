@@ -214,6 +214,7 @@
       timestamp
       number of players playing
       current density
+      density trend
       high mm
       low mm
       mm trend

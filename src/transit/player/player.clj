@@ -42,7 +42,7 @@
                    sampled-melodies
                    structures
                    next-struct-num
-                   can-schedule? ;; is not waiting for a notification
+                   can-schedule? ;; is not waiting for msg(s)
                    ])
 
 (defn get-initial-player-methods

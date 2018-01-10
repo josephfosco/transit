@@ -78,7 +78,7 @@
   (let [number-of-players (get-setting :num-players)
         init-players (map new-player (range number-of-players))
         init-melodies (map init-melody (range number-of-players))
-        init-msgs (for [x (range number-of-players)] '())
+        init-msgs (for [x (range number-of-players)] [])
         ]
     (set-setting :volume-adjust (min (/ 32 number-of-players) 1))
     (init-transit init-players init-melodies init-msgs)

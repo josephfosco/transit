@@ -54,7 +54,7 @@
 
 (defn reset-msgs-for-player-id
   [msgs player-id]
-  (assoc msgs player-id '())
+  (assoc msgs player-id [])
   )
 
 (defn try-to-clear-msgs-for-player-id

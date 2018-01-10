@@ -20,8 +20,8 @@
    )
   )
 
-(defonce events-in-channel (chan (* 2 (get-setting :num-players))))
-(defonce events-pub (pub events-in-channel :event))
+(defonce msgs-in-channel (chan (* 2 (get-setting :num-players))))
+(defonce msgs-pub (pub msgs-in-channel :msg))
 
 (defn remove-element-from-vector
   "Returns a vector with element at ndx removed
