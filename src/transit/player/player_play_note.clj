@@ -193,6 +193,20 @@
     )
   )
 
+(defn play-next-melody-event
+  [player-id upd-player melody next-melody-event event-time]
+  (let [upd-melody-event (play-melody-event (last melody)
+                                            next-melody-event
+                                            event-time)
+        upd-melody (update-melody-with-event melody upd-melody-event)
+        ]
+    (check-prior-event-note-off (last melody) upd-melody-event)
+    (update-player-and-melody upd-player upd-melody player-id)
+    (sched-next-note upd-melody-event)
+    (>!! msgs-in-channel {:msg :melody-event :data upd-melody-event})
+    (println "end:   " player-id " time: " (- (System/currentTimeMillis) event-time) "melody-event: " (:melody-event-id upd-melody-event))
+    ))
+
 (defn check-structures
   [player]
   (for [structr (:structures player)
@@ -224,16 +238,11 @@
                                         new-player
                                         melody
                                         player-id)
-        upd-melody-event (play-melody-event (last melody)
-                                            next-melody-event
-                                            event-time)
-        upd-melody (update-melody-with-event melody upd-melody-event)
-
         ]
-    (check-prior-event-note-off (last melody) upd-melody-event)
-    (update-player-and-melody upd-player upd-melody player-id)
-    (sched-next-note upd-melody-event)
-    (>!! msgs-in-channel {:msg :melody-event :data upd-melody-event})
-    (println "end -" player-id " - "(- (System/currentTimeMillis) event-time) "melody-event: " (:melody-event-id upd-melody-event))
+    (apply-at event-time
+              play-next-melody-event
+              [player-id upd-player melody next-melody-event event-time]
+              )
+    (println "sched: " player-id " time: "(- (System/currentTimeMillis) event-time) "melody-event: " (:melody-event-id next-melody-event))
     )
  )
