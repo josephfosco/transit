@@ -18,13 +18,16 @@
    [clojure.core.async :refer [<! chan go-loop sub]]
    [transit.config.config :refer [get-setting]]
    [transit.melody.melody-event :refer [get-dur-millis-from-melody-event
+                                        get-event-time-from-melody-event
                                         get-play-time-from-melody-event
                                         ]]
    [transit.util.util :refer [msgs-pub]]
    )
   )
 
-(def ^:private note-times (atom '()))
+;; note-times is a vector of lists. Each list is the time and dur-millis
+;; of a note that was played.
+(def ^:private note-times (atom []))
 
 (defrecord EnsembleStatus [])
 
@@ -45,23 +48,41 @@
    )
   )
 
+(defn event-expired?
+  ;; note time is expired if it ended 2 seconds or more before now
+  [note-time]
+  (let [earliest-time (- (System/currentTimeMillis) 2000)
+        end-time (+ (first note-time) (second note-time))
+        ]
+    (if (< end-time earliest-time) true false)
+    )
+  )
+
 (defn add-event-to-note-times
-  [cur-note-times event]
-  (conj cur-note-times event)
+  [cur-note-times new-note-time]
+  ;; remove note-times that occured more than 2 secs ago and add new event
+  (conj (vec (drop-while event-expired? cur-note-times)) new-note-time)
   )
 
 (defn new-melody-event
   [melody-event]
-  (swap! note-times
-         add-event-to-note-times
-         (list (get-play-time-from-melody-event melody-event)
-               (get-dur-millis-from-melody-event melody-event)
-               )
-         )
+  (let [play-time (get-play-time-from-melody-event melody-event)]
+    (swap! note-times
+           add-event-to-note-times
+           (list play-time
+                 (- (get-dur-millis-from-melody-event melody-event)
+                    (- play-time
+                       (get-event-time-from-melody-event melody-event))
+                    )
+                 )
+           )
+    )
   )
 
-(defn start-status
+(defn start-ensemble-status
   []
+  (reset! note-times [])
+
   (def status-out-channel (chan (* 2 (get-setting :num-players))))
   (sub msgs-pub :melody-event status-out-channel)
   (go-loop [full-msg (<! status-out-channel)]
