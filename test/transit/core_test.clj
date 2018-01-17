@@ -1,4 +1,4 @@
-;    Copyright (C) 2017  Joseph Fosco. All Rights Reserved
+;    Copyright (C) 2017-2018  Joseph Fosco. All Rights Reserved
 ;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 (ns transit.core-test
   (:require [clojure.test :refer :all]
             [transit.core :refer :all]
+            [transit.ensemble.ensemble-status-test :refer :all]
             [transit.player.player-play-note-test :refer :all]
             [transit.player.player-methods-test :refer :all]
             [transit.player.structures.gesture-test :refer :all]

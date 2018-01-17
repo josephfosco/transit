@@ -28,6 +28,8 @@
 ;; note-times is a vector of lists. Each list is the time and dur-millis
 ;; of a note that was played.
 (def ^:private note-times (atom []))
+;; note-times-millis is the number of millis to store info in notetimes
+(def ^:private note-times-millis 2000)
 
 (defrecord EnsembleStatus [])
 
@@ -51,7 +53,7 @@
 (defn event-expired?
   ;; note time is expired if it ended 2 seconds or more before now
   [note-time]
-  (let [earliest-time (- (System/currentTimeMillis) 2000)
+  (let [earliest-time (- (System/currentTimeMillis) note-times-millis)
         end-time (+ (first note-time) (second note-time))
         ]
     (if (< end-time earliest-time) true false)
@@ -78,6 +80,47 @@
            )
     )
   )
+
+(defn get-note-dur-list
+  " Returns a list of note-durs starting at from-time up til to-time
+
+    cur-note-times - a list of lists of note-start-times and durations
+    from-time - the earliest time (in millis) to return a duration for
+    to-time - the latest time (in millis) to return a duration for"
+  [cur-note-times from-time to-time]
+  (for [note-info cur-note-times
+        :let [offset (if (< (first note-info) from-time)
+                       (- from-time (first note-info))
+                       0
+                       )
+              note-time (+ (first note-info) offset)
+              note-dur (- (second note-info) offset)
+              dur (if (> (+ note-time note-dur) to-time)
+                    (- to-time note-time)
+                    note-dur)]]
+    dur)
+  )
+
+(defn get-ensemble-density-ratio
+  "Returns ratio of time sound is present to total time, in the preceeding
+   note-times-millis"
+  []
+
+  (let [cur-note-times @note-times
+        cur-time (System/currentTimeMillis)
+        from-time (- cur-time note-times-millis)
+        total-note-time (apply + (get-note-dur-list cur-note-times
+                                                    from-time
+                                                    cur-time))
+        ]
+    (/ total-note-time (* note-times-millis (get-setting :num-players)))
+    )
+ )
+
+(defn get-ensemble-density
+  []
+  (Math/round (float (* 10 (get-ensemble-density-ratio))))
+ )
 
 (defn start-ensemble-status
   []
