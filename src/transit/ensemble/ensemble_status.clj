@@ -94,7 +94,7 @@
                        0
                        )
               note-time (+ (first note-info) offset)
-              note-dur (- (second note-info) offset)
+              note-dur (max 0 (- (second note-info) offset))
               dur (if (> (+ note-time note-dur) to-time)
                     (- to-time note-time)
                     note-dur)]]
@@ -118,6 +118,7 @@
  )
 
 (defn get-ensemble-density
+  "Returns a density value between 0 and 10"
   []
   (Math/round (float (* 10 (get-ensemble-density-ratio))))
  )

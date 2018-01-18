@@ -43,12 +43,13 @@
                       '(1100000000300 350)
                       '(1100000000010 50)
                       '(1100000000000 100)
+                      '(1099999999960 10)
                       '(1099999999950 200)
                       '(1099999999900 100)
                       ]
           ]
       (is (= (get-note-dur-list note-times 1100000000000 1100000002000)
-             '(100 700 20 400 350 50 100 150 0)))
+             '(100 700 20 400 350 50 100 0 150 0)))
       )
     )
 
@@ -68,4 +69,31 @@
              '(0 50 100 700 20 400 350 50 100)))
       )
     )
+  )
+
+(deftest test-get-ensemble-density-ratio
+  (testing "computes density ratio correctly"
+    (with-redefs-fn
+      {#'transit.ensemble.ensemble-status/get-note-dur-list
+       (fn [notes from to]
+         '(100 200 400 150 225 375 500 200 300 625 700 1000 550 425 650 800))
+       #'transit.config.config/get-setting
+       (fn [key] 5)
+       }
+      #(is (= 18/25 (get-ensemble-density-ratio)))
+      )
+    )
+
+  (testing "returns 0 correctly correctly"
+    (with-redefs-fn
+      {#'transit.ensemble.ensemble-status/get-note-dur-list
+       (fn [notes from to]
+         '(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0))
+       #'transit.config.config/get-setting
+       (fn [key] 5)
+       }
+      #(is (= 0 (get-ensemble-density-ratio)))
+      )
+    )
+
   )
