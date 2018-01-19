@@ -16,7 +16,9 @@
 (ns transit.ensemble.ensemble-status
   (:require
    [clojure.core.async :refer [<! chan go-loop sub]]
+   [overtone.live :refer [apply-at]]
    [transit.config.config :refer [get-setting]]
+   [transit.config.constants :refer [STATUS-UPDATE-MILLIS]]
    [transit.melody.melody-event :refer [get-dur-millis-from-melody-event
                                         get-event-time-from-melody-event
                                         get-play-time-from-melody-event
@@ -28,8 +30,7 @@
 ;; note-times is a vector of lists. Each list is the time and dur-millis
 ;; of a note that was played.
 (def ^:private note-times (atom []))
-;; note-times-millis is the number of millis to store info in notetimes
-(def ^:private note-times-millis 2000)
+(def ^:private ensemble-density (atom 0.0))
 
 (defrecord EnsembleStatus [])
 
@@ -53,7 +54,7 @@
 (defn event-expired?
   ;; note time is expired if it ended 2 seconds or more before now
   [note-time]
-  (let [earliest-time (- (System/currentTimeMillis) note-times-millis)
+  (let [earliest-time (- (System/currentTimeMillis) STATUS-UPDATE-MILLIS)
         end-time (+ (first note-time) (second note-time))
         ]
     (if (< end-time earliest-time) true false)
@@ -108,12 +109,12 @@
 
   (let [cur-note-times @note-times
         cur-time (System/currentTimeMillis)
-        from-time (- cur-time note-times-millis)
+        from-time (- cur-time STATUS-UPDATE-MILLIS)
         total-note-time (apply + (get-note-dur-list cur-note-times
                                                     from-time
                                                     cur-time))
         ]
-    (/ total-note-time (* note-times-millis (get-setting :num-players)))
+    (/ total-note-time (* STATUS-UPDATE-MILLIS (get-setting :num-players)))
     )
  )
 
@@ -121,11 +122,27 @@
   "Returns a density value between 0 and 10"
   []
   (Math/round (float (* 10 (get-ensemble-density-ratio))))
- )
+  )
+
+(defn update-ensemble-status
+  []
+  (reset! ensemble-density (get-ensemble-density))
+  (apply-at (+ (System/currentTimeMillis) STATUS-UPDATE-MILLIS)
+            update-ensemble-status)
+  )
+
+(defn reset-ensemble-status
+  []
+  (reset! note-times [])
+  (reset! ensemble-density 0)
+  )
 
 (defn start-ensemble-status
   []
-  (reset! note-times [])
+  (reset-ensemble-status)
+
+  (apply-at (+ (System/currentTimeMillis) STATUS-UPDATE-MILLIS)
+            update-ensemble-status)
 
   (def status-out-channel (chan (* 2 (get-setting :num-players))))
   (sub msgs-pub :melody-event status-out-channel)

@@ -20,6 +20,9 @@
   )
 
 (def SAVED-MELODY-LEN 64)
+;; STATUS_UPDATE_MILLIS is the number of millis between updates to
+;; player or ensemble status information
+(def STATUS-UPDATE-MILLIS 2000)
 
 (def FREE 0)
 (def METERED 1)

@@ -69,6 +69,14 @@
              '(0 50 100 700 20 400 350 50 100)))
       )
     )
+
+  (testing "returns empty list in note-times is empty"
+    (let [note-times []
+          ]
+      (is (= (get-note-dur-list note-times 1000000000000 1000000002000)
+             '()))
+      )
+    )
   )
 
 (deftest test-get-ensemble-density-ratio
@@ -89,6 +97,18 @@
       {#'transit.ensemble.ensemble-status/get-note-dur-list
        (fn [notes from to]
          '(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0))
+       #'transit.config.config/get-setting
+       (fn [key] 5)
+       }
+      #(is (= 0 (get-ensemble-density-ratio)))
+      )
+    )
+
+  (testing "returns 0 when note-times is empty"
+    (with-redefs-fn
+      {#'transit.ensemble.ensemble-status/get-note-dur-list
+       (fn [notes from to]
+         '())
        #'transit.config.config/get-setting
        (fn [key] 5)
        }
