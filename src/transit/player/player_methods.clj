@@ -19,6 +19,7 @@
    [transit.instr.instrument :refer [select-instrument]]
    [transit.player.structures.base-structure :refer [set-structr-id]]
    [transit.player.structures.gesture :refer [create-gesture-structr]]
+   [transit.player.structures.listen :refer [create-listen-structr]]
    [transit.player.structures.random-event :refer [create-random-structr]]
    [transit.player.structures.motif :refer [create-motif]]
    [transit.melody.melody-event :refer [get-dur-millis-from-melody-event
@@ -72,9 +73,9 @@
   (if (list? structr-type)
     (assoc player
            :structures
-           (vec (for [structr (:Structures player)
-                      :when (not-any? #{structr} structr-type)]
-                  struct
+           (vec (for [structr (:structures player)
+                      :when (not-any? #{type structr} structr-type)]
+                  structr
                   )))
     (assoc player
            :structures
@@ -103,12 +104,12 @@
 
 
 (defn set-behavior
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn play-random-rest
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  play-random-rest  ******" player-id)
   [ensemble
    (add-structure player
@@ -120,7 +121,7 @@
   )
 
 (defn play-random
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  play-random  ******" player-id)
   [ensemble
    (add-structure player
@@ -132,7 +133,7 @@
   )
 
 (defn play-rest
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  play-rest  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
@@ -140,11 +141,11 @@
 (declare build-gesture)
 (declare build-motif)
 (defn select-instrument-for-player
-  [[ensemble player melody player-id rtn-map :as args]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  select-instrument-for-player  ******" player-id)
   (let [cur-methods (:methods player)
         first-instrument? (nil? (:instrument player))
-        new-instrument (select-instrument args)
+        new-instrument (select-instrument ensemble player melody player-id)
         new-player (if first-instrument?
                      (assoc (remove-structure-type player '(Gesture
                                                             Motif
@@ -166,7 +167,7 @@
   )
 
 (defn select-key
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  select-key  ******" player-id)
   [ensemble
    (assoc player :key (select-random-key))
@@ -176,13 +177,13 @@
   )
 
 (defn select-mm
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  select-mm  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn select-scale
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  select-scale  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
@@ -192,19 +193,19 @@
    Notify player when someone plays
    Tell player how long you will watch for
   "
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  monitor-silence  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn monitor-soft
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  monitor-soft  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn sync-with-another-player
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  sync-with-another-player  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
@@ -226,16 +227,22 @@
       average volume
       volume trend
   "
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  listen  ******" player-id)
-  [ensemble player melody player-id {:status CONTINUE}]
+  [ensemble
+   (add-structure player
+                  (create-listen-structr :internal-strength weight))
+   melody
+   player-id
+   {:status OK}
+   ]
   )
 
 
 ;; TOP DOWN METHODS
 
 (defn build-gesture
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  build-gesture  ******" player-id)
   [ensemble
    (add-structure player (create-gesture-structr :internal-strength 1
@@ -248,7 +255,7 @@
   )
 
 (defn build-motif
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  build-motif  ******" player-id)
   [ensemble
    (add-structure player
@@ -261,31 +268,31 @@
   )
 
 (defn build-melody
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  build-melody  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn build-countermelody
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  build-countermelody  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn sustained-accompaniment
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  sustained-accompaniment  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn arpegiation
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  arpegiation  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )
 
 (defn loop-notes
-  [[ensemble player melody player-id rtn-map]]
+  [[ensemble player melody player-id weight rtn-map]]
   (println "******  loop  ******" player-id)
   [ensemble player melody player-id {:status CONTINUE}]
   )

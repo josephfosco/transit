@@ -51,6 +51,11 @@
    )
   )
 
+(defn get-ensemble-density
+  []
+  @ensemble-density
+  )
+
 (defn event-expired?
   ;; note time is expired if it ended 2 seconds or more before now
   [note-time]
@@ -118,7 +123,7 @@
     )
  )
 
-(defn get-ensemble-density
+(defn compute-ensemble-density
   "Returns a density value between 0 and 10"
   []
   (Math/round (float (* 10 (get-ensemble-density-ratio))))
@@ -126,7 +131,7 @@
 
 (defn update-ensemble-status
   []
-  (reset! ensemble-density (get-ensemble-density))
+  (reset! ensemble-density (compute-ensemble-density))
   (apply-at (+ (System/currentTimeMillis) STATUS-UPDATE-MILLIS)
             update-ensemble-status)
   )

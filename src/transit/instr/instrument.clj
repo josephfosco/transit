@@ -127,7 +127,7 @@
     ))
 
 (defn select-instrument
-  [[ensemble player melody player-id]]
+  [ensemble player melody player-id]
   (select-random-instrument)
   )
 

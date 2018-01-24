@@ -66,7 +66,6 @@
 
 (defn create-new-gesture-event
   [player gesture]
-  (println "CREATING GESTURE EVENT")
   {:note (if (nil? (:gesture-nextevent-ndx gesture))
            (select-random-pitch-for-player player)
            (let [prior-note (:note
@@ -87,7 +86,6 @@
   " Returns an updated gesture and a melody-event based on the
     :gesture-next-event-ndx from :gesture-events"
   [player next-melody-id gesture]
-  (println "!!!!!! get-next-gesture-event  !!!!!")
   (let [next-gesture-event ((:gesture-events gesture)
                            (:gesture-next-event-ndx gesture))
         next-gesture-event-ndx (if (:gesture-complete? gesture)
@@ -96,7 +94,6 @@
                                  (inc (:gesture-next-event-ndx gesture))
                                  )
         ]
-    (println "@@@@@@ PLAYING GESTURE EVENT @@@@@@@@")
     [
      ;; After playing last note of gesture (next-gesture-event-ndx = 0 and
      ;;   :complete gesture) the cleanup-fn is set to nil (no cleanup needed)
@@ -241,7 +238,6 @@
   [ensemble player melody player-id gesture next-melody-id]
   (cond (:gesture-complete? gesture)
         (do
-          (println "%%%%%%%%  Playing Existing Gesture  %%%%%%%%%%")
           (let [new-gesture (if (and (not= 0 (:gesture-next-event-ndx gesture))
                                      (not=
                                       next-melody-id
@@ -263,7 +259,6 @@
         ;; a new gesture.
         (> (count (:gesture-events gesture)) 0)
         (do
-          (println "CONTINUING TO BUILD GESTURE!!!!")
           (get-next-gesture-event player
                                   next-melody-id
                                   (create-gesture-event player gesture))
@@ -272,11 +267,9 @@
         (let [new-gesture (complete-gesture-structr gesture melody)]
           (if (:gesture-complete? new-gesture)
             (do
-              (println "$$$$$$ found-gesture ")
               (get-next-gesture-event player next-melody-id new-gesture)
               )
             (do
-              (println "NO MATCHING GESTURE!!!!")
               (get-next-gesture-event player
                                       next-melody-id
                                       (create-gesture-event player gesture))

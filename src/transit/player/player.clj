@@ -49,7 +49,7 @@
   []
   (let [time (System/currentTimeMillis)]
       [
-       (MethodInfo. listen 2 time)
+       (MethodInfo. listen 10 time)
        (MethodInfo. monitor-silence 1 time)
        (MethodInfo. select-key 1 time)
        (MethodInfo. select-mm 1 time)

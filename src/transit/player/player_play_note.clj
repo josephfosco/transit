@@ -52,6 +52,11 @@
   (:method ((:methods player) ndx))
   )
 
+(defn get-method-weight
+  [player ndx]
+  (:weight ((:methods player) ndx))
+  )
+
 (defn is-playing?
  "Returns:
    true - if player is playing now
@@ -83,14 +88,18 @@
       method removed from :methods
   "
   [[ensemble player melody player-id :as method_context]]
-  (let [method-ndx (select-method player)]
+  (let [method-ndx (select-method player)
+        mthd (get-player-method player method-ndx)
+        weight (get-method-weight player method-ndx)
+        ]
     ;; remove the method that will be run from player :methods
-    ((get-player-method player method-ndx)
+    (mthd
      [ensemble
       (assoc player
              :methods (remove-element-from-vector (:methods player)  method-ndx))
       melody
       player-id
+      weight
       ])
      )
   )
@@ -213,6 +222,7 @@
         :when (not (some #{(type structr)}
                          '(transit.player.structures.gesture.Gesture
                            transit.player.structures.random_event.RandomEvent
+                           transit.player.structures.listen.Listen
                            )))]
     (do
       (println player)
