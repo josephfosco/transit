@@ -29,6 +29,7 @@
                                                      get-structr-id]]
    [transit.melody.melody-event :refer [get-structr-id-from-melody-event]]
    [transit.util.random :refer [weighted-choice]]
+   [transit.util.util :refer [remove-element-from-vector]]
    )
   (:import transit.player.player_methods.MethodInfo)
   )
@@ -38,9 +39,9 @@
                    scale
                    mm
                    instrument-info
-                   methods
+                   methods  ;; a vector of methods to possibly run
                    sampled-melodies
-                   structures
+                   structures  ;; a vector of structures built or being built
                    next-struct-num
                    can-schedule? ;; is not waiting for msg(s)
                    ])
@@ -49,7 +50,7 @@
   []
   (let [time (System/currentTimeMillis)]
       [
-       (MethodInfo. listen 10 time)
+       (MethodInfo. listen 8 time)
        (MethodInfo. monitor-silence 1 time)
        (MethodInfo. select-key 1 time)
        (MethodInfo. select-mm 1 time)
@@ -81,6 +82,11 @@
 (defn get-player-instrument-info
   [player]
   (:instrument-info player))
+
+(defn remove-structr
+  [structr-vec structr-ndx]
+  (remove-element-from-vector structr-vec structr-ndx)
+  )
 
 (defn find-high-strength
   " A reducing function to find the index of the structr with the highest strength
@@ -169,20 +175,33 @@
                           player
                           (cleanup-structr-id player prev-structr-id))
         ]
-    (if melody-event
-      [(assoc cleanup-player
-              :structures
-              (assoc (:structures cleanup-player)
-                     selected-struct-index
-                     new-struct))
-       melody-event
-       ]
-      [cleanup-player
-       (create-random-rest-melody-event
-        player-id
-        (inc (:melody-event-id (last melody))))
-       ]
-      )
+    (cond (and melody-event new-struct)
+          [(assoc cleanup-player
+                  :structures
+                  (assoc (:structures cleanup-player)
+                         selected-struct-index
+                         new-struct))
+           melody-event
+           ]
+
+          ;; if there is a melody event, but new-struct is nil,
+          ;; remove the structure from the player
+          melody-event
+          [(assoc cleanup-player
+                  :structures
+                  (remove-structr (:structures cleanup-player)
+                                  selected-struct-index
+                                  ))
+           melody-event
+           ]
+
+          :else
+          [cleanup-player
+           (create-random-rest-melody-event
+            player-id
+            (inc (:melody-event-id (last melody))))
+           ]
+          )
     )
   )
 

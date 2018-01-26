@@ -15,11 +15,17 @@
 
 (ns transit.player.structures.listen
   (:require
+   [transit.melody.dur-info :refer [create-dur-info]]
    [transit.melody.melody-event :refer [create-melody-event]]
-   [transit.melody.rhythm :refer [select-random-rhythm]]
-   [transit.player.structures.base-structure :refer [create-base-structure]]
+   [transit.util.random :refer [random-int]]
+   [transit.player.structures.base-structure :refer [create-base-structure
+                                                     get-internal-strength
+                                                     set-internal-strength]]
    )
 )
+
+(def ^:private min-listen-millis 2500)
+(def ^:private max-listen-millis 10000)
 
 (defrecord Listen [base])
 
@@ -28,7 +34,8 @@
   (create-melody-event
    :melody-event-id next-id
    :note nil
-   :dur-info (select-random-rhythm)
+   :dur-info (create-dur-info
+              :dur-millis (random-int min-listen-millis max-listen-millis))
    :volume nil
    :instrument-info nil
    :player-id (:id player)
@@ -38,10 +45,24 @@
   )
 
 (defn get-listen-melody-event
-  [ensemble player melody player-id rnd-evnt next-id]
+  [ensemble player melody player-id listen-structr next-id]
   (println "#### getting listen melody event ####")
-  [rnd-evnt (get-rest-event player next-id)]
-  )
+  (let [new-int-strength (- (get-internal-strength listen-structr)
+                            (random-int
+                             1 (int (/ (get-internal-strength listen-structr)
+                                       2))))
+        ]
+    [(if (not= new-int-strength 0)
+       (set-internal-strength listen-structr
+                              (- (get-internal-strength listen-structr)
+                                 (random-int
+                                  1 (int (/ (get-internal-strength listen-structr)
+                                            2))))
+                              )
+       nil
+       )
+     (get-rest-event player next-id)]
+    ))
 
 (defn create-listen-structr
   [& {:keys [structr-id
