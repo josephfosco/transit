@@ -24,8 +24,10 @@
                           strength-fn
                           melody-fn
                           cleanup-fn
+                          post-play-fn
                           created-at
-                          updated-at])
+                          updated-at
+                          last-played])
 
 (defn get-base-strength
   [structr]
@@ -53,6 +55,11 @@
 (defn get-melody-fn
   [structr]
   (:melody-fn (:base structr))
+  )
+
+(defn get-post-play-fn
+  [structr]
+  (:post-play-fn (:base structr))
   )
 
 (defn get-internal-strength
@@ -102,12 +109,14 @@
              external-strength
              strength-fn
              melody-fn
+             post-play-fn
              cleanup-fn] :or
       {structr-id "none"
        internal-strength 0
        external-strength 0
        strength-fn get-base-strength
        cleanup-fn nil
+       post-play-fn nil
        }}]
   (BaseStructure. structr-id
                   internal-strength
@@ -116,7 +125,9 @@
                   strength-fn
                   melody-fn
                   cleanup-fn
+                  post-play-fn
                   (System/currentTimeMillis)
                   (System/currentTimeMillis)
+                  nil  ;; last-played
                   )
   )

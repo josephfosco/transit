@@ -83,6 +83,13 @@
   [player]
   (:instrument-info player))
 
+(defn get-player-structr
+  [player structr-id]
+  (first (for [structr (:structures player)
+               :when (= structr-id (get-structr-id structr))]
+           structr))
+ )
+
 (defn remove-structr
   [structr-vec structr-ndx]
   (remove-element-from-vector structr-vec structr-ndx)

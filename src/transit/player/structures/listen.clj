@@ -20,6 +20,7 @@
    [transit.util.random :refer [random-int]]
    [transit.player.structures.base-structure :refer [create-base-structure
                                                      get-internal-strength
+                                                     get-structr-id
                                                      set-internal-strength]]
    )
 )
@@ -29,8 +30,13 @@
 
 (defrecord Listen [base])
 
+(defn sub-ensemble-status
+  [structr player]
+  (println "$$$$$$$$$$$ sub-ensemble-status $$$$$$$$$$$$$")
+  )
+
 (defn get-rest-event
-  [player next-id]
+  [player next-id listen-structr]
   (create-melody-event
    :melody-event-id next-id
    :note nil
@@ -40,7 +46,7 @@
    :instrument-info nil
    :player-id (:id player)
    :event-time nil
-   :structr-id nil
+   :structr-id (get-structr-id listen-structr)
    )
   )
 
@@ -52,7 +58,8 @@
                              1 (int (/ (get-internal-strength listen-structr)
                                        2))))
         ]
-    [(if (not= new-int-strength 0)
+    [
+     (if (not= new-int-strength 0)
        (set-internal-strength listen-structr
                               (- (get-internal-strength listen-structr)
                                  (random-int
@@ -61,7 +68,8 @@
                               )
        nil
        )
-     (get-rest-event player next-id)]
+     (get-rest-event player next-id listen-structr)
+     ]
     ))
 
 (defn create-listen-structr
@@ -75,6 +83,7 @@
   (Listen. (create-base-structure :structr-id structr-id
                                        :internal-strength internal-strength
                                        :external-strength external-strength
-                                       :melody-fn get-listen-melody-event)
+                                       :melody-fn get-listen-melody-event
+                                       :post-play-fn sub-ensemble-status)
                  )
   )

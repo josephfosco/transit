@@ -19,14 +19,15 @@
    [transit.melody.pitch :refer [select-random-pitch]]
    [transit.melody.rhythm :refer [select-random-rhythm]]
    [transit.melody.volume :refer [select-random-volume]]
-   [transit.player.structures.base-structure :refer [create-base-structure]]
+   [transit.player.structures.base-structure :refer [create-base-structure
+                                                     get-structr-id]]
    )
 )
 
 (defrecord RandomEvent [base rest?])
 
 (defn get-random-note-event
-  [player next-id]
+  [player next-id rnd-evnt]
   (create-melody-event
    :melody-event-id next-id
    :note (select-random-pitch (:range-lo (:instrument-info player))
@@ -36,12 +37,12 @@
    :instrument-info (:instrument-info player)
    :player-id (:id player)
    :event-time nil
-   :structr-id nil
+   :structr-id (get-structr-id rnd-evnt)
    )
   )
 
 (defn get-random-rest-event
-  [player next-id]
+  [player next-id rnd-evnt]
   (create-melody-event
    :melody-event-id next-id
    :note nil
@@ -50,15 +51,15 @@
    :instrument-info nil
    :player-id (:id player)
    :event-time nil
-   :structr-id nil
+   :structr-id (get-structr-id rnd-evnt)
    )
   )
 
 (defn get-random-melody-event
   [ensemble player melody player-id rnd-evnt next-id]
   (if (or (:rest? rnd-evnt) (= (rand-int 2) 0))
-    [rnd-evnt (get-random-rest-event player next-id)]
-    [rnd-evnt (get-random-note-event player next-id)]
+    [rnd-evnt (get-random-rest-event player next-id rnd-evnt)]
+    [rnd-evnt (get-random-note-event player next-id rnd-evnt)]
     )
   )
 

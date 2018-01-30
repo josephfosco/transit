@@ -35,10 +35,12 @@
                                         get-note-off-from-melody-event
                                         get-player-id-from-melody-event
                                         get-sc-instrument-id-from-melody-event
+                                        get-structr-id-from-melody-event
                                         get-volume-from-melody-event
                                         set-play-info]]
-   [transit.player.player :refer [get-next-melody-event]]
+   [transit.player.player :refer [get-next-melody-event get-player-structr]]
    [transit.player.player-methods :refer [NEW-MELODY NEXT-METHOD]]
+   [transit.player.structures.base-structure :refer [get-post-play-fn]]
    [transit.util.random :refer [weighted-choice]]
    [transit.util.util :refer [remove-element-from-vector msgs-in-channel]]
    )
@@ -208,9 +210,15 @@
                                             next-melody-event
                                             event-time)
         upd-melody (update-melody-with-event melody upd-melody-event)
+        cur-structr (get-player-structr
+                     upd-player
+                     (get-structr-id-from-melody-event next-melody-event))
+        post-play-fn (get-post-play-fn cur-structr)
         ]
     (check-prior-event-note-off (last melody) upd-melody-event)
     (update-player-and-melody upd-player upd-melody player-id)
+    (when post-play-fn
+      (post-play-fn cur-structr upd-player))
     (sched-next-note upd-melody-event)
     (>!! msgs-in-channel {:msg :melody-event :data upd-melody-event})
     (println "end:   " player-id " time: " (- (System/currentTimeMillis) event-time) "melody-event: " (:melody-event-id upd-melody-event))
