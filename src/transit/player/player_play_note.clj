@@ -38,9 +38,13 @@
                                         get-structr-id-from-melody-event
                                         get-volume-from-melody-event
                                         set-play-info]]
-   [transit.player.player :refer [get-next-melody-event get-player-structr]]
-   [transit.player.player-methods :refer [NEW-MELODY NEXT-METHOD]]
-   [transit.player.structures.base-structure :refer [get-post-play-fn]]
+   [transit.player.player-utils :refer [get-next-melody-event
+                                        get-player-structr
+                                        remove-structr-by-structr-id
+                                        NEXT-METHOD]]
+   [transit.player.structures.base-structure :refer [get-post-play-fn
+                                                     get-structr-id
+                                                     remove-structr?]]
    [transit.util.random :refer [weighted-choice]]
    [transit.util.util :refer [remove-element-from-vector msgs-in-channel]]
    )
@@ -160,15 +164,16 @@
 (declare play-next-note)
 (defn sched-next-note
   [melody-event]
-  (let [next-time (- (+ (get-event-time-from-melody-event melody-event)
-                        (get-dur-millis-from-melody-event melody-event)
-                        )
-                     METHOD-PROCESS-MILLIS
-                     STRUCTURE-PROCESS-MILLIS)]
-    (apply-at next-time
-              play-next-note
-              [(get-player-id-from-melody-event melody-event) next-time]
-     ))
+  (when (get-dur-info-from-melody-event melody-event)
+    (let [next-time (- (+ (get-event-time-from-melody-event melody-event)
+                          (get-dur-millis-from-melody-event melody-event)
+                          )
+                       METHOD-PROCESS-MILLIS
+                       STRUCTURE-PROCESS-MILLIS)]
+      (apply-at next-time
+                play-next-note
+                [(get-player-id-from-melody-event melody-event) next-time]
+                )))
   )
 
 (defn play-melody-event
@@ -205,22 +210,33 @@
   )
 
 (defn play-next-melody-event
-  [player-id upd-player melody next-melody-event event-time]
+  [player-id player melody next-melody-event event-time]
   (let [upd-melody-event (play-melody-event (last melody)
                                             next-melody-event
                                             event-time)
         upd-melody (update-melody-with-event melody upd-melody-event)
         cur-structr (get-player-structr
-                     upd-player
+                     player
                      (get-structr-id-from-melody-event next-melody-event))
         post-play-fn (get-post-play-fn cur-structr)
+        upd-player (if (remove-structr? cur-structr)
+                     (assoc player
+                            :structures
+                            (remove-structr-by-structr-id
+                             (:structures player)
+                             (get-structr-id cur-structr)
+                             ))
+                     player
+                     )
         ]
     (check-prior-event-note-off (last melody) upd-melody-event)
     (update-player-and-melody upd-player upd-melody player-id)
     (when post-play-fn
       (post-play-fn cur-structr upd-player))
     (sched-next-note upd-melody-event)
-    (>!! msgs-in-channel {:msg :melody-event :data upd-melody-event})
+    (>!! msgs-in-channel {:msg :melody-event
+                          :data upd-melody-event
+                          :time (System/currentTimeMillis)})
     (println "end:   " player-id " time: " (- (System/currentTimeMillis) event-time) "melody-event: " (:melody-event-id upd-melody-event))
     ))
 

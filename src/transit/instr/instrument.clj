@@ -17,7 +17,6 @@
   (:require
    [overtone.live :refer :all]
    ;; [transit.constants :refer :all]
-;;   [transit.ensemble.player :refer [get-player-id]]
    [transit.instr.instrumentinfo :refer [create-instrument-info
                                          get-instrument-from-instrument-info
                                          get-envelope-type-from-instrument-info

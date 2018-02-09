@@ -27,6 +27,10 @@
 (def FREE 0)
 (def METERED 1)
 
+(def DECREASING 0)
+(def STEADY 1)
+(def INCREASING 2)
+
 ;; midi notes below 16 are less than 20 hz
 (def MIN-NOTE 16)
 (def MAX-NOTE (last MIDI-RANGE))

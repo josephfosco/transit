@@ -17,6 +17,7 @@
   (:require
    [transit.config.constants :refer [FREE METERED]]
    [transit.instr.instrument :refer [select-instrument]]
+   [transit.player.player-utils :refer [CONTINUE NEXT-METHOD OK]]
    [transit.player.structures.base-structure :refer [set-structr-id]]
    [transit.player.structures.gesture :refer [create-gesture-structr]]
    [transit.player.structures.listen :refer [create-listen-structr]]
@@ -36,12 +37,6 @@
   )
 
 (defrecord MethodInfo [method weight created-at])
-
-;; method return values
-(def OK 1)  ;; Method completed normally
-(def CONTINUE 1)  ;; Processing complete - do not call additional methods
-(def NEW-MELODY 2)  ;; Processing complete - last melody event is new
-(def NEXT-METHOD 3)  ;; Select and call another method
 
 (defn create-method-info
   [method weight]

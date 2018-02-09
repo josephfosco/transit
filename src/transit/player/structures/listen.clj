@@ -15,13 +15,19 @@
 
 (ns transit.player.structures.listen
   (:require
+   [clojure.core.async :refer [<! chan close! sub go]]
+   [overtone.live :refer [apply-at]]
    [transit.melody.dur-info :refer [create-dur-info]]
    [transit.melody.melody-event :refer [create-melody-event]]
+   [transit.player.player-utils :refer [get-player-id]]
+   [transit.player.player-play-note :refer [play-next-note]]
    [transit.util.random :refer [random-int]]
    [transit.player.structures.base-structure :refer [create-base-structure
                                                      get-internal-strength
                                                      get-structr-id
-                                                     set-internal-strength]]
+                                                     set-internal-strength
+                                                     set-remove-structr]]
+   [transit.util.util :refer [msgs-pub]]
    )
 )
 
@@ -32,16 +38,32 @@
 
 (defn sub-ensemble-status
   [structr player]
-  (println "$$$$$$$$$$$ sub-ensemble-status $$$$$$$$$$$$$")
+  (println "$$$$$$$$$$$ sub-ensemble-status player-id: " (get-player-id player) " $$$$$$$$$$$$$$$")
+  (let [ens-out-chan (chan)
+        player-id (get-player-id player)
+        ]
+    (sub msgs-pub :ensemble-status ens-out-chan)
+    (go (let [status-msg (<! ens-out-chan)]
+          (close! ens-out-chan)
+          (println "!!!!!!!!!! GOT STATUS MESSAGE player-id: " player-id " !!!!!!!!!!!")
+          (apply-at 0
+                    play-next-note
+                    [player-id (System/currentTimeMillis)]
+                    )
+          ))
+    )
   )
+
+   ;; :dur-info (create-dur-info
+   ;;            :dur-millis (random-int min-listen-millis max-listen-millis))
+
 
 (defn get-rest-event
   [player next-id listen-structr]
   (create-melody-event
    :melody-event-id next-id
    :note nil
-   :dur-info (create-dur-info
-              :dur-millis (random-int min-listen-millis max-listen-millis))
+   :dur-info nil
    :volume nil
    :instrument-info nil
    :player-id (:id player)
@@ -52,21 +74,18 @@
 
 (defn get-listen-melody-event
   [ensemble player melody player-id listen-structr next-id]
-  (println "#### getting listen melody event ####")
   (let [new-int-strength (- (get-internal-strength listen-structr)
                             (random-int
-                             1 (int (/ (get-internal-strength listen-structr)
-                                       2))))
+                             1
+                             (max 1
+                                  (int (/ (get-internal-strength listen-structr)
+                                          2)))))
         ]
     [
      (if (not= new-int-strength 0)
-       (set-internal-strength listen-structr
-                              (- (get-internal-strength listen-structr)
-                                 (random-int
-                                  1 (int (/ (get-internal-strength listen-structr)
-                                            2))))
-                              )
-       nil
+       (set-internal-strength listen-structr new-int-strength)
+       (set-internal-strength (set-remove-structr listen-structr true)
+                              new-int-strength)
        )
      (get-rest-event player next-id listen-structr)
      ]

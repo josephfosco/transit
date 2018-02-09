@@ -17,7 +17,7 @@
   (:require
    [transit.config.config :refer [get-setting]]
    [transit.melody.melody-event :refer [print-melody-event]]
-   [transit.player.player :refer [print-player]]
+   [transit.player.player-utils :refer [print-player]]
    [transit.util.log :as log]
    )
   )

@@ -15,15 +15,19 @@
 
 (ns transit.ensemble.ensemble-status
   (:require
-   [clojure.core.async :refer [<! chan go-loop sub]]
+   [clojure.core.async :refer [<! >!! chan go-loop sub]]
    [overtone.live :refer [apply-at]]
    [transit.config.config :refer [get-setting]]
-   [transit.config.constants :refer [STATUS-UPDATE-MILLIS]]
-   [transit.melody.melody-event :refer [get-dur-millis-from-melody-event
+   [transit.config.constants :refer [STATUS-UPDATE-MILLIS
+                                     DECREASING
+                                     INCREASING
+                                     STEADY]]
+   [transit.melody.melody-event :refer [get-note-from-melody-event
+                                        get-dur-millis-from-melody-event
                                         get-event-time-from-melody-event
                                         get-play-time-from-melody-event
                                         ]]
-   [transit.util.util :refer [msgs-pub]]
+   [transit.util.util :refer [msgs-in-channel msgs-pub]]
    )
   )
 
@@ -32,23 +36,28 @@
 (def ^:private note-times (atom []))
 (def ^:private ensemble-density (atom 0.0))
 
-(defrecord EnsembleStatus [])
+(defrecord EnsembleStatus [density density-trend])
 
 (defn create-ensemble-status
-  [& {:keys [num-players-counted
-             keys
-             scales
-             num-loud
-             num-soft
-             num-fast
-             num-slow
-             num-melody
-             num-sustained
-             num-rhythmic
+  [& {:keys [density
+             density-trend
              ]
       }]
-  (EnsembleStatus.
-   )
+  ;; [& {:keys [num-players-counted
+  ;;            keys
+  ;;            scales
+  ;;            num-loud
+  ;;            num-soft
+  ;;            num-fast
+  ;;            num-slow
+  ;;            num-melody
+  ;;            num-sustained
+  ;;            num-rhythmic
+  ;;            ]
+  ;;     }]
+  (EnsembleStatus. density
+                   density-trend
+                   )
   )
 
 (defn get-ensemble-density
@@ -74,17 +83,18 @@
 
 (defn new-melody-event
   [melody-event]
-  (let [play-time (get-play-time-from-melody-event melody-event)]
-    (swap! note-times
-           add-event-to-note-times
-           (list play-time
-                 (- (get-dur-millis-from-melody-event melody-event)
-                    (- play-time
-                       (get-event-time-from-melody-event melody-event))
-                    )
-                 )
-           )
-    )
+  (when (get-note-from-melody-event melody-event)
+    (let [play-time (get-play-time-from-melody-event melody-event)]
+      (swap! note-times
+             add-event-to-note-times
+             (list play-time
+                   (- (get-dur-millis-from-melody-event melody-event)
+                      (- play-time
+                         (get-event-time-from-melody-event melody-event))
+                      )
+                   )
+             )
+      ))
   )
 
 (defn get-note-dur-list
@@ -131,7 +141,15 @@
 
 (defn update-ensemble-status
   []
-  (reset! ensemble-density (compute-ensemble-density))
+  (let [new-ens-density (compute-ensemble-density)
+        ens-status (create-ensemble-status new-ens-density STEADY)
+        ]
+    (reset! ensemble-density new-ens-density)
+    (>!! msgs-in-channel
+         {:msg :ensemble-status
+          :status ens-status
+          :time (System/currentTimeMillis)})
+    )
   (apply-at (+ (System/currentTimeMillis) STATUS-UPDATE-MILLIS)
             update-ensemble-status)
   )

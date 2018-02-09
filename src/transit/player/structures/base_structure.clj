@@ -27,7 +27,8 @@
                           post-play-fn
                           created-at
                           updated-at
-                          last-played])
+                          last-played
+                          remove-structr])
 
 (defn get-base-strength
   [structr]
@@ -98,9 +99,20 @@
     )
   )
 
+(defn set-remove-structr
+  [structr new-remove-structr]
+  (assoc structr :base (assoc (:base structr)
+                              :remove-structr new-remove-structr))
+  )
+
 (defn set-structr-id
   [structr new-structr-id]
   (assoc structr :base (assoc (:base structr) :structr-id new-structr-id))
+  )
+
+(defn remove-structr?
+  [structr]
+  (:remove-structr (:base structr))
   )
 
 (defn create-base-structure
@@ -129,5 +141,6 @@
                   (System/currentTimeMillis)
                   (System/currentTimeMillis)
                   nil  ;; last-played
+                  false  ;; remove-structr
                   )
   )
