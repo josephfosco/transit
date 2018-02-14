@@ -15,13 +15,13 @@
 
 (ns transit.util.util
   (:require
-   [clojure.core.async :refer [chan pub]]
+   [clojure.core.async :refer [chan close! pub]]
    [transit.config.config :refer [get-setting]]
    )
   )
 
-(defonce msgs-in-channel (chan (* 2 (get-setting :num-players))))
-(defonce msgs-pub (pub msgs-in-channel :msg))
+(def msgs-in-channel (atom nil))
+(def msgs-pub (atom nil))
 
 (defn remove-element-from-vector
   "Returns a vector with element at ndx removed
@@ -31,4 +31,26 @@
   "
   [vctr ndx]
   (into (subvec vctr 0 ndx) (subvec vctr (inc ndx)))
+  )
+
+(defn get-msg-channel
+ []
+ @msgs-in-channel
+ )
+
+(defn get-msg-pub
+ []
+ @msgs-pub
+ )
+
+(defn start-msg-channel
+  []
+(reset! msgs-in-channel (chan (* 2 (get-setting :num-players))))
+(reset! msgs-pub (pub @msgs-in-channel :msg))
+  )
+
+(defn close-msg-channel
+  []
+  (close! @msgs-in-channel)
+  (reset! msgs-in-channel nil)
   )

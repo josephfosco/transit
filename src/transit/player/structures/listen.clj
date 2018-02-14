@@ -27,7 +27,7 @@
                                                      get-structr-id
                                                      set-internal-strength
                                                      set-remove-structr]]
-   [transit.util.util :refer [msgs-pub]]
+   [transit.util.util :refer [get-msg-pub]]
    )
 )
 
@@ -42,7 +42,7 @@
   (let [ens-out-chan (chan)
         player-id (get-player-id player)
         ]
-    (sub msgs-pub :ensemble-status ens-out-chan)
+    (sub (get-msg-pub) :ensemble-status ens-out-chan)
     (go (let [status-msg (<! ens-out-chan)]
           (close! ens-out-chan)
           (println "!!!!!!!!!! GOT STATUS MESSAGE player-id: " player-id " !!!!!!!!!!!")

@@ -46,7 +46,7 @@
                                                      get-structr-id
                                                      remove-structr?]]
    [transit.util.random :refer [weighted-choice]]
-   [transit.util.util :refer [remove-element-from-vector msgs-in-channel]]
+   [transit.util.util :refer [remove-element-from-vector get-msg-channel]]
    )
   )
 
@@ -234,9 +234,9 @@
     (when post-play-fn
       (post-play-fn cur-structr upd-player))
     (sched-next-note upd-melody-event)
-    (>!! msgs-in-channel {:msg :melody-event
-                          :data upd-melody-event
-                          :time (System/currentTimeMillis)})
+    (>!! (get-msg-channel) {:msg :melody-event
+                             :data upd-melody-event
+                             :time (System/currentTimeMillis)})
     (println "end:   " player-id " time: " (- (System/currentTimeMillis) event-time) "melody-event: " (:melody-event-id upd-melody-event))
     ))
 

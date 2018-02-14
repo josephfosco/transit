@@ -47,6 +47,11 @@
   []
   (quit-transit))
 
+(defn transit-stop
+  "same as transit-quit"
+  []
+  (quit-transit))
+
 (defn transit-pause
   "Stop playing after players finish what they have scheduled"
   []

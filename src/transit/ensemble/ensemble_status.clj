@@ -27,7 +27,7 @@
                                         get-event-time-from-melody-event
                                         get-play-time-from-melody-event
                                         ]]
-   [transit.util.util :refer [msgs-in-channel msgs-pub]]
+   [transit.util.util :refer [get-msg-channel get-msg-pub]]
    )
   )
 
@@ -145,7 +145,7 @@
         ens-status (create-ensemble-status new-ens-density STEADY)
         ]
     (reset! ensemble-density new-ens-density)
-    (>!! msgs-in-channel
+    (>!! (get-msg-channel)
          {:msg :ensemble-status
           :status ens-status
           :time (System/currentTimeMillis)})
@@ -168,7 +168,7 @@
             update-ensemble-status)
 
   (def status-out-channel (chan (* 2 (get-setting :num-players))))
-  (sub msgs-pub :melody-event status-out-channel)
+  (sub (get-msg-pub) :melody-event status-out-channel)
   (go-loop [full-msg (<! status-out-channel)]
     (when full-msg
       (let [{:keys [data]} full-msg]

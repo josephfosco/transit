@@ -15,7 +15,7 @@
 
 (ns transit.control
   (:require
-   [overtone.live :refer [now]]
+   [overtone.live :refer [now stop]]
    [transit.config.config :refer [get-setting set-setting]]
    [transit.ensemble.ensemble :refer [init-ensemble]]
    [transit.ensemble.ensemble-status :refer [start-ensemble-status]]
@@ -24,10 +24,9 @@
    [transit.melody.melody-event :refer [create-melody-event]]
    [transit.util.log :as log]
    [transit.util.print :refer [print-banner]]
+   [transit.util.util :refer [close-msg-channel start-msg-channel]]
    )
   )
-
-(defonce transit-started (atom false))
 
 (defn init-transit
   "Initialize transit to play. Use only once (first time)
@@ -74,6 +73,7 @@
 
 (defn start-transit
   [& {:keys [num-players]}]
+  (start-msg-channel)
   (when num-players (set-setting :num-players num-players))
   (let [number-of-players (get-setting :num-players)
         init-players (map new-player (range number-of-players))
@@ -82,10 +82,7 @@
         ]
     (set-setting :volume-adjust (min (/ 32 number-of-players) 1))
     (init-transit init-players init-melodies init-msgs)
-    (when (not @transit-started)
-      (start-ensemble-status)
-      (reset! transit-started true)
-      )
+    (start-ensemble-status)
     (start-playing)
     )
   )
@@ -100,4 +97,6 @@
 
 (defn quit-transit
   []
+  (stop)
+  (close-msg-channel)
   )
