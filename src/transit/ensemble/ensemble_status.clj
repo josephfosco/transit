@@ -142,8 +142,10 @@
 (defn update-ensemble-status
   []
   (let [new-ens-density (compute-ensemble-density)
-        ens-status (create-ensemble-status new-ens-density STEADY)
+        ens-status (create-ensemble-status :density new-ens-density
+                                           :density-trend STEADY)
         ]
+    (println "****************** new-density: " new-ens-density " ************************")
     (reset! ensemble-density new-ens-density)
     (>!! (get-msg-channel)
          {:msg :ensemble-status

@@ -15,7 +15,7 @@
 
 (ns transit.util.util
   (:require
-   [clojure.core.async :refer [chan close! pub]]
+   [clojure.core.async :refer [<! chan close! go-loop pub]]
    [transit.config.config :refer [get-setting]]
    )
   )
@@ -34,19 +34,28 @@
   )
 
 (defn get-msg-channel
- []
- @msgs-in-channel
- )
+  []
+  @msgs-in-channel
+  )
 
 (defn get-msg-pub
- []
- @msgs-pub
- )
+  []
+  @msgs-pub
+  )
+
+(defn drain-chan
+  "Used to remove any remaining messages from a closed channel"
+  [ch]
+  (go-loop []
+    (if (some? (<! ch))
+      (recur))
+      )
+  )
 
 (defn start-msg-channel
   []
-(reset! msgs-in-channel (chan (* 2 (get-setting :num-players))))
-(reset! msgs-pub (pub @msgs-in-channel :msg))
+  (reset! msgs-in-channel (chan (* 2 (get-setting :num-players))))
+  (reset! msgs-pub (pub @msgs-in-channel :msg))
   )
 
 (defn close-msg-channel

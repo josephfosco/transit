@@ -15,7 +15,7 @@
 
 (ns transit.player.structures.listen
   (:require
-   [clojure.core.async :refer [<! chan close! sub go]]
+   [clojure.core.async :refer [<! chan close! go-loop sub]]
    [overtone.live :refer [apply-at]]
    [transit.melody.dur-info :refer [create-dur-info]]
    [transit.melody.melody-event :refer [create-melody-event]]
@@ -27,12 +27,9 @@
                                                      get-structr-id
                                                      set-internal-strength
                                                      set-remove-structr]]
-   [transit.util.util :refer [get-msg-pub]]
+   [transit.util.util :refer [drain-chan get-msg-pub]]
    )
 )
-
-(def ^:private min-listen-millis 2500)
-(def ^:private max-listen-millis 10000)
 
 (defrecord Listen [base])
 
@@ -43,20 +40,22 @@
         player-id (get-player-id player)
         ]
     (sub (get-msg-pub) :ensemble-status ens-out-chan)
-    (go (let [status-msg (<! ens-out-chan)]
+    (go-loop [status-msg (<! ens-out-chan)]
+      (println "!!!!!!!!!! GOT STATUS MESSAGE player-id: " player-id " !!!!!!!!!!!")
+      (if (>= (:density (:status status-msg)) (random-int 0 9))
+        (do
           (close! ens-out-chan)
-          (println "!!!!!!!!!! GOT STATUS MESSAGE player-id: " player-id " !!!!!!!!!!!")
+          (drain-chan ens-out-chan)
           (apply-at 0
                     play-next-note
                     [player-id (System/currentTimeMillis)]
-                    )
-          ))
+                    ))
+
+        (recur (<! ens-out-chan))
+        )
+      )
     )
   )
-
-   ;; :dur-info (create-dur-info
-   ;;            :dur-millis (random-int min-listen-millis max-listen-millis))
-
 
 (defn get-rest-event
   [player next-id listen-structr]
