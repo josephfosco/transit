@@ -65,18 +65,18 @@
 
 (defn remove-structure-type
   [player structr-type & {:keys [:time] :or {time nil}}]
-  (if (list? structr-type)
+  (if (seq? structr-type)
     (assoc player
            :structures
            (vec (for [structr (:structures player)
-                      :when (not-any? #{type structr} structr-type)]
+                      :when (not-any? #(not= (type structr) %) structr-type)]
                   structr
                   )))
     (assoc player
            :structures
            (vec (filter #(not= structr-type (type %)) (:structures player)))
-           ))
-
+           )
+    )
   )
 
 (defn next-structr-id

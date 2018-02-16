@@ -18,7 +18,7 @@
         transit.player.player-play-note
         )
   (:require
-   [transit.player.player-methods :refer [CONTINUE NEXT-METHOD]]
+   [transit.player.player-utils :refer [CONTINUE NEXT-METHOD]]
    )
   )
 
